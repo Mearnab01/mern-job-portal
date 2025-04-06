@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,10 +12,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeClosed, LoaderPinwheel } from "lucide-react";
-
+import { USER_API } from "@/utils/constant";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading, setUser } from "@/redux/authSlice";
 const PasswordInput = ({ value, onChange }) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
@@ -38,6 +43,7 @@ const PasswordInput = ({ value, onChange }) => {
 };
 
 const Auth = () => {
+  const navigate = useNavigate();
   const [signupInput, setSignupInput] = useState({
     fullname: "",
     email: "",
@@ -60,11 +66,34 @@ const Auth = () => {
       setLoginInput({ ...loginInput, [name]: value });
     }
   };
-
+  const dispatch = useDispatch();
+  const { user, loading } = useSelector((state) => state.auth);
   const handleSubmit = async (type) => {
     const inputData = type === "signup" ? signupInput : loginInput;
-    console.log(inputData);
+    const endpoint = type === "signup" ? "/register" : "/login";
+
+    try {
+      dispatch(setLoading(true));
+      const { data } = await axios.post(`${USER_API}${endpoint}`, inputData, {
+        withCredentials: true,
+      });
+      console.log(data);
+      dispatch(setUser(data.user));
+      toast.success(data.message || `${type} successful`);
+      navigate("/");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    } finally {
+      dispatch(setLoading(false));
+    }
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, []);
+
   return (
     <div>
       <div className="flex justify-center items-center w-full mt-20">
@@ -153,7 +182,16 @@ const Auth = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button onClick={() => handleSubmit("signup")}>Sign Up</Button>
+                {loading ? (
+                  <LoaderPinwheel
+                    size={20}
+                    className="animate-spin mr-4 w-4 h-4"
+                  />
+                ) : (
+                  <Button onClick={() => handleSubmit("signup")}>
+                    Sign Up
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           </TabsContent>
@@ -215,7 +253,14 @@ const Auth = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button onClick={() => handleSubmit("login")}>Login</Button>
+                {loading ? (
+                  <LoaderPinwheel
+                    size={20}
+                    className="animate-spin mr-4 w-4 h-4"
+                  />
+                ) : (
+                  <Button onClick={() => handleSubmit("login")}>Login</Button>
+                )}
               </CardFooter>
             </Card>
           </TabsContent>

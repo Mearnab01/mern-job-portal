@@ -5,6 +5,8 @@ import Navbar from "./components/Navbar";
 import Auth from "./components/auth/Auth";
 //pages
 import Home from "./pages/Home";
+import Jobs from "./pages/Jobs";
+import Notification from "./pages/Notification";
 
 const App = () => {
   const Layout = () => {
@@ -22,6 +24,8 @@ const App = () => {
       children: [
         { path: "/auth", element: <Auth /> },
         { path: "/", element: <Home /> },
+        { path: "/jobs", element: <Jobs /> },
+        { path: "/notifications", element: <Notification /> },
       ],
     },
   ]);
