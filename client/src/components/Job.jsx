@@ -14,6 +14,8 @@ import {
 } from "./ui/card";
 import { formatDistanceToNow } from "date-fns";
 const Job = ({ job }) => {
+  // comes from jobs.jsx
+  const navigate = useNavigate();
   const daysAgoFunction = (mongodbTime) => {
     return formatDistanceToNow(new Date(mongodbTime), { addSuffix: true });
   };
@@ -61,7 +63,8 @@ const Job = ({ job }) => {
 
       <CardFooter className="flex gap-4 mt-4 p-4 pt-2">
         <Button
-          onClick={() => navigate(`/description/${job?._id}`)}
+          onClick={() => navigate(`/details/${job?._id}`)}
+          //onClick={() => navigate(`/details/123`)}
           variant="outline"
         >
           Details

@@ -7,6 +7,7 @@ import Auth from "./components/auth/Auth";
 import Home from "./pages/Home";
 import Jobs from "./pages/Jobs";
 import Notification from "./pages/Notification";
+import JobDetails from "./pages/JobDetails";
 
 const App = () => {
   const Layout = () => {
@@ -26,6 +27,7 @@ const App = () => {
         { path: "/", element: <Home /> },
         { path: "/jobs", element: <Jobs /> },
         { path: "/notifications", element: <Notification /> },
+        { path: "/details/:id", element: <JobDetails /> },
       ],
     },
   ]);
