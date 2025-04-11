@@ -12,21 +12,27 @@ import {
   CardFooter,
   CardDescription,
 } from "./ui/card";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNowStrict } from "date-fns";
+
 const Job = ({ job }) => {
-  // comes from jobs.jsx
   const navigate = useNavigate();
-  const daysAgoFunction = (mongodbTime) => {
-    return formatDistanceToNow(new Date(mongodbTime), { addSuffix: true });
+
+  const getTimeAgo = (date) => {
+    const distance = formatDistanceToNowStrict(new Date(date), {
+      addSuffix: true,
+    });
+
+    if (distance.includes("less than") || distance.includes("seconds")) {
+      return "Just now";
+    }
+
+    return distance;
   };
+
   return (
     <Card className="shadow-md border">
       <CardHeader className="flex flex-row items-center justify-between p-4">
-        <p className="text-sm text-gray-500">
-          {daysAgoFunction(job?.createdAt) === 0
-            ? "Today"
-            : `${daysAgoFunction(job?.createdAt)} days ago`}
-        </p>
+        <p className="text-sm text-gray-500">{getTimeAgo(job?.createdAt)}</p>
         <Button variant="outline" size="icon" className="rounded-full">
           <Bookmark size={18} />
         </Button>
@@ -44,7 +50,7 @@ const Job = ({ job }) => {
         </div>
 
         <CardTitle className="text-lg font-bold mb-1">{job?.title}</CardTitle>
-        <CardDescription className="text-gray-600 text-sm">
+        <CardDescription className="text-gray-600 text-sm truncate">
           {job?.description}
         </CardDescription>
 
@@ -64,7 +70,6 @@ const Job = ({ job }) => {
       <CardFooter className="flex gap-4 mt-4 p-4 pt-2">
         <Button
           onClick={() => navigate(`/details/${job?._id}`)}
-          //onClick={() => navigate(`/details/123`)}
           variant="outline"
         >
           Details

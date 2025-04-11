@@ -8,21 +8,39 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Bell, BriefcaseBusinessIcon, Home, LogOut, User2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "@/redux/authSlice";
+import { USER_API } from "@/utils/constant";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const Navbar = () => {
+  const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = {
+  /*   const demoUser = {
     name: "John Doe",
     role: "student", // or 'student'
     profile: {
       profilePhoto: "/user.jpg",
       bio: "HR Manager @ Microsoft",
     },
-  };
+  }; */
 
-  const handleLogout = () => {
-    // Logout logic (API + Redux dispatch or context clear)
-    navigate("/");
+  const logoutHandler = async () => {
+    try {
+      const res = await axios.post(`${USER_API}/logout`, {
+        withCredentials: true,
+      });
+      if (res.data.success) {
+        dispatch(setUser(null));
+        navigate("/");
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message || "Failed to Logout user!");
+    }
   };
 
   return (
@@ -88,7 +106,13 @@ const Navbar = () => {
             <Popover>
               <PopoverTrigger asChild>
                 <Avatar className="cursor-pointer">
-                  <AvatarImage src={user?.profile?.profilePhoto} alt="User" />
+                  <AvatarImage
+                    src={
+                      user?.profile?.profilePhoto ||
+                      "https://github.com/shadcn.png"
+                    }
+                    alt="User"
+                  />
                   <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
               </PopoverTrigger>
@@ -112,7 +136,7 @@ const Navbar = () => {
                       variant="link"
                       className="justify-start px-0"
                     >
-                      <Link to="/profile">
+                      <Link to="/my-profile">
                         <User2 className="w-4 h-4 mr-2" />
                         View Profile
                       </Link>
@@ -120,7 +144,7 @@ const Navbar = () => {
                   )}
                   <Button
                     variant="link"
-                    onClick={handleLogout}
+                    onClick={logoutHandler}
                     className="justify-start px-0 text-red-500"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
@@ -131,10 +155,10 @@ const Navbar = () => {
             </Popover>
           ) : (
             <>
-              <Link to="/login">
+              <Link to="/auth">
                 <Button variant="outline">Login</Button>
               </Link>
-              <Link to="/signup">
+              <Link to="/auth">
                 <Button className="bg-de_primary text-white hover:bg-purple-600">
                   Signup
                 </Button>

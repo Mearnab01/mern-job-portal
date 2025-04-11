@@ -8,6 +8,12 @@ import Home from "./pages/Home";
 import Jobs from "./pages/Jobs";
 import Notification from "./pages/Notification";
 import JobDetails from "./pages/JobDetails";
+import Profile from "./pages/Profile";
+import Companies from "./components/admin/Companies";
+import CompanySetup from "./components/admin/CompanySetup";
+import AdminJobs from "./components/admin/AdminJobs";
+import Applicants from "./components/admin/Applicants";
+import PostJob from "./components/admin/PostJob";
 
 const App = () => {
   const Layout = () => {
@@ -27,7 +33,15 @@ const App = () => {
         { path: "/", element: <Home /> },
         { path: "/jobs", element: <Jobs /> },
         { path: "/notifications", element: <Notification /> },
+        { path: "/my-profile", element: <Profile /> },
         { path: "/details/:id", element: <JobDetails /> },
+
+        // ✅ Admin routes (no ProtectedRoute yet)
+        { path: "/admin/companies", element: <Companies /> },
+        { path: "/admin/companies/:id", element: <CompanySetup /> },
+        { path: "/admin/jobs", element: <AdminJobs /> },
+        { path: "/admin/jobs/create", element: <PostJob /> },
+        { path: "/admin/jobs/:id/applicants", element: <Applicants /> },
       ],
     },
   ]);
