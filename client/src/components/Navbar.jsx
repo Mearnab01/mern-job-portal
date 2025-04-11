@@ -13,19 +13,12 @@ import { setUser } from "@/redux/authSlice";
 import { USER_API } from "@/utils/constant";
 import toast from "react-hot-toast";
 import axios from "axios";
+import MobileNav from "@/responsive/MobileNav";
 
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  /*   const demoUser = {
-    name: "John Doe",
-    role: "student", // or 'student'
-    profile: {
-      profilePhoto: "/user.jpg",
-      bio: "HR Manager @ Microsoft",
-    },
-  }; */
 
   const logoutHandler = async () => {
     try {
@@ -58,8 +51,8 @@ const Navbar = () => {
           </h1>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center gap-6">
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-6">
           {user?.role === "recruiter" ? (
             <>
               <Link
@@ -165,6 +158,11 @@ const Navbar = () => {
               </Link>
             </>
           )}
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden">
+          <MobileNav user={user} logoutHandler={logoutHandler} />
         </div>
       </div>
     </div>

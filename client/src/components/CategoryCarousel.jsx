@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Carousel,
   CarouselContent,
@@ -25,27 +24,33 @@ const categories = [
   "Machine Learning Engineer",
   "Database Administrator",
   "QA Tester",
-  "Soil Test Engineer ",
+  "Soil Test Engineer",
   "Technical Support Engineer",
 ];
+
 const CategoryCarousel = () => {
   return (
-    <Carousel className="w-full max-w-[45rem] mx-auto my-20">
-      <CarouselContent>
-        {categories.map((category, index) => (
-          <CarouselItem key={index} className=" md:basis-1/2 lg:basis-1/3">
-            <Button
-              variant="outline"
-              className="text-center w-full rounded-full hover:bg-de_primary hover:text-white transition-all duration-300 ease-out"
+    <div className="relative overflow-hidden px-4 sm:px-6 my-10">
+      <Carousel className="max-w-6xl mx-auto">
+        <CarouselContent>
+          {categories.map((category, index) => (
+            <CarouselItem
+              key={index}
+              className="w-[85%] sm:basis-1/2 lg:basis-1/3 mx-auto px-2"
             >
-              {category}
-            </Button>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
-    </Carousel>
+              <Button
+                variant="outline"
+                className="w-full rounded-full text-center hover:bg-de_primary hover:text-white transition-all duration-300 ease-out text-sm sm:text-base"
+              >
+                {category}
+              </Button>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
+    </div>
   );
 };
 

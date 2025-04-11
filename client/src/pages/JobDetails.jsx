@@ -16,7 +16,7 @@ const JobDetails = () => {
     applications: ["user1", "user2"],
     createdAt: new Date().toISOString(),
     company: "TechNova Pvt Ltd",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_TV_2015.png", // Demo logo
+    logo: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_TV_2015.png",
   };
 
   const [isApplied, setIsApplied] = useState(false);
@@ -33,26 +33,9 @@ const JobDetails = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto my-10 px-4 flex gap-6">
-      {/* LEFT SIDEBAR: Suggested Jobs */}
-      <aside className="w-1/5 bg-white rounded-xl shadow-md p-4 h-fit sticky top-10">
-        <h2 className="text-lg font-semibold mb-4">Suggested Jobs</h2>
-        <div className="space-y-4">
-          {suggestedJobs.map((job, index) => (
-            <div
-              key={index}
-              className="border p-3 rounded-lg hover:shadow transition cursor-pointer"
-            >
-              <h3 className="font-semibold text-gray-800">{job.title}</h3>
-              <p className="text-sm text-gray-500">{job.company}</p>
-              <p className="text-xs text-gray-400">{job.location}</p>
-            </div>
-          ))}
-        </div>
-      </aside>
-
-      {/* RIGHT SIDE: Job Details */}
-      <div className="w-4/5 space-y-6">
+    <div className="max-w-4xl mx-auto my-10 px-4 space-y-8">
+      {/* Main Job Details */}
+      <div className="space-y-6">
         {/* Header */}
         <div className="bg-white p-6 rounded-xl shadow-md flex flex-col md:flex-row justify-between items-start md:items-center">
           <div className="flex items-center gap-4">
@@ -132,6 +115,23 @@ const JobDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Suggested Jobs - below main details */}
+      <aside className="bg-white rounded-xl shadow-md p-6">
+        <h2 className="text-lg font-semibold mb-4">Suggested Jobs</h2>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {suggestedJobs.map((job, index) => (
+            <div
+              key={index}
+              className="border p-3 rounded-lg hover:shadow transition cursor-pointer"
+            >
+              <h3 className="font-semibold text-gray-800">{job.title}</h3>
+              <p className="text-sm text-gray-500">{job.company}</p>
+              <p className="text-xs text-gray-400">{job.location}</p>
+            </div>
+          ))}
+        </div>
+      </aside>
     </div>
   );
 };

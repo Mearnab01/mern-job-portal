@@ -10,6 +10,7 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
+import MobileFilterCard from "@/responsive/MobileFilterCard";
 
 const Jobs = () => {
   // pagination state
@@ -32,17 +33,23 @@ const Jobs = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-[1400px] mx-auto px-4 py-8">
-        <div className="flex gap-6">
-          {/* Sidebar */}
-          <aside className="w-1/4 sticky top-24 self-start max-h-[calc(100vh-6rem)] overflow-y-auto custom-scroll">
+        <div className="flex flex-col sm:flex-row gap-6">
+          {/* Sidebar Filter - Only Desktop */}
+          <aside className="hidden sm:block sm:w-1/4 sticky top-24 self-start max-h-[calc(100vh-6rem)] overflow-y-auto custom-scroll">
             <FilterCard />
           </aside>
 
-          {/* Jobs Grid */}
-          <main className="flex-1">
+          {/* Main Content */}
+          <main className="flex-1 w-full">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">
               Available Jobs
             </h2>
+
+            {/* Mobile Filter - Only Mobile */}
+            <div className="sm:hidden mb-6">
+              <MobileFilterCard />
+            </div>
+
             {filterJobs.length <= 0 ? (
               <div className="text-center text-gray-600 mt-10">
                 <p className="text-lg font-medium">🔍 No jobs found</p>
