@@ -1,35 +1,39 @@
-import React, { useState } from "react";
-import { Contact, Mail } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Contact, Mail, User2, ScanEye } from "lucide-react";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useSelector } from "react-redux";
 import UpdateProfile from "@/components/UpdateProfile";
 import AppliedJobTable from "@/components/AppliedJobTable";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { setUser } from "@/redux/authSlice";
 
 const Profile = () => {
-  const [user, setUser] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "1234567890",
-    bio: "Frontend Developer passionate about building beautiful interfaces.",
-    skills: ["React", "JavaScript", "CSS", "Tailwind"],
-    resume: "https://example.com/resume.pdf",
-    resumeOriginalName: "John_Doe_Resume.pdf",
-    profilePhoto: "https://github.com/shadcn.png",
-  });
+  const { user } = useSelector((store) => store.auth);
+  const [imagePreview, setImagePreview] = useState(
+    user?.profile?.profilePicture || "https://github.com/shadcn.png"
+  );
 
-  const isResume = !!user.resume;
+  // Update image preview whenever user profile picture is updated
+  useEffect(() => {
+    if (user?.profile?.profilePicture) {
+      setImagePreview(user.profile.profilePicture);
+    }
+  }, [user?.profile?.profilePicture]);
+
+  const isResume = !!user?.resume;
 
   return (
     <div className="bg-gray-100 min-h-screen py-10 px-4">
       <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
         {/* Left Side - Profile Card */}
         <div className="bg-white p-6 rounded-2xl shadow-md flex flex-col items-center text-center">
-          <Avatar className="h-28 w-28 mb-4">
-            <AvatarImage src={user.profilePhoto} alt="profile" />
+          <Avatar className="w-40 h-40 mb-4">
+            <AvatarImage
+              src={imagePreview} // Image preview state used here
+              alt="profile"
+              className="rounded-full object-contain bg-gray-200"
+            />
           </Avatar>
-          <h1 className="text-2xl font-semibold mb-1">{user.name}</h1>
-          <p className="text-gray-500 text-sm mb-3">{user.bio}</p>
+          <h1 className="text-2xl font-semibold mb-1">{user.fullname}</h1>
           <div className="flex flex-col gap-2 w-full text-left text-sm mt-4">
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-gray-600" />
@@ -37,7 +41,21 @@ const Profile = () => {
             </div>
             <div className="flex items-center gap-2">
               <Contact className="h-4 w-4 text-gray-600" />
-              <span>{user.phone}</span>
+              <span>{user.phoneNumber}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <User2 className="h-4 w-4 text-gray-600" />
+              <strong className="m-2 text-de_primary">{user.role}</strong>
+            </div>
+            <div className="flex items-center gap-2">
+              <ScanEye className="h-4 w-4 text-gray-600" />
+              {user?.profile?.bio ? (
+                <span className="text-gray-700 text-sm">
+                  {user.profile.bio}
+                </span>
+              ) : (
+                <span className="text-gray-400 italic">Add your bio</span>
+              )}
             </div>
           </div>
         </div>
@@ -45,12 +63,11 @@ const Profile = () => {
         {/* Right Side - Details + Update */}
         <div className="md:col-span-2 flex flex-col gap-6">
           {/* Skills & Resume */}
-          {/* Skills & Resume */}
           <div className="bg-white p-6 rounded-2xl shadow-md">
             <h2 className="text-lg font-semibold mb-3">Skills</h2>
             <div className="flex flex-wrap gap-2 mb-4">
-              {user.skills.length > 0 ? (
-                user.skills.map((skill, idx) => {
+              {user?.profile?.skills?.length > 0 ? (
+                user.profile.skills.map((skill, idx) => {
                   const colors = [
                     "bg-blue-100 text-blue-800",
                     "bg-green-100 text-green-800",
@@ -61,12 +78,12 @@ const Profile = () => {
                   ];
                   const colorClass = colors[idx % colors.length];
                   return (
-                    <Badge
+                    <div
                       key={idx}
                       className={`rounded-full px-3 py-1 text-sm font-medium ${colorClass}`}
                     >
                       {skill}
-                    </Badge>
+                    </div>
                   );
                 })
               ) : (
@@ -76,7 +93,7 @@ const Profile = () => {
 
             {/* Resume */}
             <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label className="text-md font-bold">Resume</Label>
+              <div className="text-md font-bold">Resume</div>
               {isResume ? (
                 <a
                   href={user.resume}
@@ -92,9 +109,9 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Update Profile Section */}
-          <div className="bg-white p-6 rounded-2xl shadow-md">
-            <h2 className="text-lg font-semibold mb-4">Update Profile</h2>
+          {/* Update Bio Section (Full Width) */}
+          <div className="bg-white p-6 rounded-2xl shadow-md w-full">
+            <h2 className="text-lg font-semibold mb-4">Edit Bio</h2>
             <UpdateProfile user={user} setUser={setUser} />
           </div>
         </div>

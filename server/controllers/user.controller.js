@@ -4,6 +4,8 @@ import { Application } from "../models/application.model.js";
 import { generateToken } from "../middlewares/generateTokenAndVerify.js";
 import { asyncHandler } from "../middlewares/errorHandler.js";
 import bcrypt from "bcryptjs";
+
+import { v2 as cloudinary } from "cloudinary";
 //1. register user
 export const registerUser = asyncHandler(async (req, res) => {
   const { fullname, email, password, role, phoneNumber } = req.body;
@@ -82,59 +84,98 @@ export const loginUser = asyncHandler(async (req, res) => {
     email: user.email,
     role: user.role,
     phoneNumber: user.phoneNumber,
-    profile: user.profile,
+    profile: {
+      bio: user.profile?.bio || "",
+      skills: user.profile?.skills || [],
+      resume: user.profile?.resume || "",
+    },
   };
   return generateToken(res, loggedInUser, `Welcome back ${user.fullname}`);
 });
 //3. logout user
 export const logoutUser = asyncHandler(async (req, res) => {
-  return res.status(200).cookie("token", "", { maxAge: 0 }).json({
-    success: true,
-    message: "User logged out successfully",
-  });
+  try {
+    res.cookie("token", "", {
+      httpOnly: true,
+      maxAge: 0, // Clears the cookie
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "User logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout Error:", error.message);
+  }
 });
+
 //4. update user
 export const updateUser = asyncHandler(async (req, res) => {
   const { fullname, email, phoneNumber, bio, skills } = req.body;
-  const file = req.file;
-  //setup cloudinary for image and resume
+  let { profilePicture } = req.body;
 
-  let skillsArry;
-  if (skills) {
-    skillsArry = [
-      ...new Set(
-        skills
-          .split(",")
-          .map((skill) => skill.trim().toLowerCase())
-          .filter((skill) => skill)
-      ),
-    ];
+  if (!fullname && !email && !phoneNumber && !bio && !skills) {
+    return res.status(400).json({
+      message: "At least one field is required to update",
+      success: false,
+    });
   }
+  const file = req.file;
 
   const userId = req.id;
-  let user = await User.findById(userId);
+  const user = await User.findById(userId);
   if (!user) {
     return res.status(404).json({ message: "User not found", success: false });
   }
+  if (profilePicture) {
+    if (user.profile.profilePicture) {
+      await cloudinary.uploader.destroy(
+        user.profile.profilePicture.split("/").pop().split(".")[0]
+      );
+      const uploadResponse = await cloudinary.uploader.upload(profilePicture);
+      profilePicture = uploadResponse.secure_url;
+    }
+  }
+  let skillsArray = user.profile.skills || [];
+  skillsArray = skills
+    .split(",") // Split the string by commas
+    .map((skill) => skill.trim().toLowerCase()) // Trim spaces and convert to lowercase
+    .filter(Boolean); // Remove any empty strings
+
+  // Remove duplicates using a Set
+  skillsArray = [...new Set(skillsArray)];
   if (fullname) user.fullname = fullname;
   if (email) user.email = email;
   if (phoneNumber) user.phoneNumber = phoneNumber;
   if (bio) user.profile.bio = bio;
-  if (skills) user.profile.skills = skillsArry;
+  if (skillsArray) user.profile.skills = skillsArray;
+  if (profilePicture) user.profile.profilePicture = profilePicture;
+
+  // Handle resume file upload
+  if (file) {
+    user.profile.resume = file.path;
+  }
 
   await user.save();
-  user = {
+
+  const userData = {
     _id: user._id,
     fullname: user.fullname,
     email: user.email,
-    role: user.role,
     phoneNumber: user.phoneNumber,
-    profile: user.profile,
+    role: user.role,
+    profile: {
+      bio: user.profile?.bio || "",
+      skills: user.profile?.skills || [],
+      profilePicture: user.profile?.profilePicture || "",
+      resume: user.profile?.resume || "",
+    },
   };
+
   return res.status(200).json({
     message: "User updated successfully",
     success: true,
-    user,
+    user: userData,
   });
 });
 

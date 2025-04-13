@@ -17,6 +17,8 @@ import MobileNav from "@/responsive/MobileNav";
 
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
+  console.log(user);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -101,23 +103,30 @@ const Navbar = () => {
                 <Avatar className="cursor-pointer">
                   <AvatarImage
                     src={
-                      user?.profile?.profilePhoto ||
+                      user?.profile?.profilePicture ||
                       "https://github.com/shadcn.png"
                     }
+                    className="cursor-pointer object-contain bg-gray-200"
                     alt="User"
                   />
-                  <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{user?.fullname?.charAt(0)}</AvatarFallback>
                 </Avatar>
               </PopoverTrigger>
               <PopoverContent className="w-64">
                 <div className="flex gap-3 items-center">
                   <Avatar>
-                    <AvatarImage src={user?.profile?.profilePhoto} />
-                    <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                    <AvatarImage
+                      src={
+                        user?.profile?.profilePicture ||
+                        "https://github.com/shadcn.png"
+                      }
+                      className="cursor-pointer object-contain bg-gray-200"
+                    />
+                    <AvatarFallback>{user?.fullname?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
                     <h4 className="font-medium">{user?.name}</h4>
-                    <p className="text-sm text-gray-500 truncate">
+                    <p className="text-sm text-gray-500 truncate flex-wrap">
                       {user?.profile?.bio}
                     </p>
                   </div>

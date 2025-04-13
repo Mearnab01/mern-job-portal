@@ -21,16 +21,16 @@ const MobileNav = () => {
   const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation(); // 👈 new
+  const location = useLocation();
 
   const [isClient, setIsClient] = useState(false);
-  const [isOpen, setIsOpen] = useState(false); // 👈 sheet open state
+  const [isOpen, setIsOpen] = useState(false); // manually control Sheet
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // 👇 auto-close on route change
+  // Close sheet on route change
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);

@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { connectdb } from "./utils/connectDb.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
-
+import { v2 as cloudinary } from "cloudinary";
 // Import routes
 import userRoutes from "./routes/user.routes.js";
 import companyRoutes from "./routes/company.routes.js";
@@ -26,6 +26,11 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
 const port = process.env.PORT || 5000;
 app.use("/api/user", userRoutes);
 app.use("/api/company", companyRoutes);
