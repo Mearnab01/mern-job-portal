@@ -114,7 +114,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
 
 //4. update user
 export const updateUser = asyncHandler(async (req, res) => {
-  const { fullname, email, phoneNumber, bio, skills } = req.body;
+  const { fullname, phoneNumber, bio, skills } = req.body;
   const files = req.files;
   const userId = req.id;
 
@@ -157,7 +157,6 @@ export const updateUser = asyncHandler(async (req, res) => {
 
   // === Other Fields ===
   if (fullname) user.fullname = fullname;
-  if (email) user.email = email;
   if (phoneNumber) user.phoneNumber = phoneNumber;
   if (bio) user.profile.bio = bio;
 
@@ -191,30 +190,5 @@ export const updateUser = asyncHandler(async (req, res) => {
     message: "User updated successfully",
     success: true,
     user: userData,
-  });
-});
-
-//5. delete user
-export const deleteUser = asyncHandler(async (req, res) => {
-  const userId = req.id;
-  const user = await User.findById(userId);
-  if (!user) {
-    return res.status(404).json({ message: "User not found", success: false });
-  }
-  //step1: find all applications of the user
-  const deletedApplications = await Application.find({ applicant: userId });
-  const deleteAppIds = deletedApplications.map((app) => app._id);
-  //step2: remove those from job documents
-  const jobs = await Job.updateMany(
-    { applications: { $in: deleteAppIds } },
-    { $pull: { applications: { $in: deleteAppIds } } }
-  );
-  //step3: remove the application documents
-  await Application.deleteMany({ applicant: userId });
-  //step4: delete the user
-  await User.findByIdAndDelete(userId);
-  return res.status(200).json({
-    message: "User deleted successfully",
-    success: true,
   });
 });

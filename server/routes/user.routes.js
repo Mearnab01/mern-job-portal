@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  deleteUser,
   loginUser,
   logoutUser,
   registerUser,
@@ -14,5 +13,4 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/update-profile", isAuth, upload, updateUser);
-router.delete("/delete-profile", isAuth, deleteUser);
 export default router;

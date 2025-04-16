@@ -62,12 +62,12 @@ const UpdateProfile = ({ user }) => {
     ) {
       setFormData((prev) => ({
         ...prev,
-        resumeFile: file, // Set resume file in state
+        resumeFile: file,
       }));
       setResumeSelected(true); // show green check
       setResumeFileName(file.name);
     } else {
-      toast.error("Invalid resume file. Please upload a PDF or Word document.");
+      toast.error("Invalid resume file. Please upload a PDF");
       setFormData((prev) => ({
         ...prev,
         resumeFile: null,
@@ -83,7 +83,6 @@ const UpdateProfile = ({ user }) => {
 
     const updatedData = new FormData();
     updatedData.append("fullname", formData.fullname);
-    updatedData.append("email", formData.email);
     updatedData.append("phoneNumber", formData.phoneNumber);
     updatedData.append("bio", formData.bio);
     updatedData.append("skills", formData.skills);
@@ -139,17 +138,6 @@ const UpdateProfile = ({ user }) => {
               <Input
                 name="fullname"
                 value={formData.fullname}
-                onChange={handleChange}
-                className="col-span-3"
-              />
-            </div>
-
-            {/* Email */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Email</Label>
-              <Input
-                name="email"
-                value={formData.email}
                 onChange={handleChange}
                 className="col-span-3"
               />
