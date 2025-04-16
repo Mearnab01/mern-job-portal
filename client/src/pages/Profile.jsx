@@ -78,7 +78,9 @@ const Profile = () => {
                   );
                 })
               ) : (
-                <span>NA</span>
+                <span className="text-gray-400 italic">
+                  Add your skills (e.g: web dev, ai-ml..)
+                </span>
               )}
             </div>
 

@@ -12,8 +12,7 @@ const applicationSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    //resume: { type: String, required: true },
-    coverLetter: { type: String, required: true },
+    resume: { type: String },
     status: {
       type: String,
       enum: ["pending", "accepted", "rejected"],

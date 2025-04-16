@@ -126,9 +126,11 @@ const Navbar = () => {
                   <div>
                     <h4 className="font-medium">{user?.name}</h4>
                     <p className="text-sm text-gray-500">
-                      {user?.profile?.bio.length > 20
-                        ? user?.profile?.bio.slice(0, 20) + "..."
-                        : user?.profile?.bio}
+                      {user?.profile?.bio
+                        ? user.profile.bio.length > 20
+                          ? user.profile.bio.slice(0, 20) + "..."
+                          : user.profile.bio
+                        : "No bio added yet"}
                     </p>
                   </div>
                 </div>

@@ -19,24 +19,9 @@ export const createJobByAdmin = asyncHandler(async (req, res) => {
     isActive,
     isRemote,
   } = req.body;
+
   const userId = req.id;
-  if (
-    !title ||
-    !description ||
-    !requirements ||
-    !position ||
-    !salary ||
-    !experienceLevel ||
-    !location ||
-    !jobType ||
-    !companyId ||
-    !isActive ||
-    !isRemote
-  ) {
-    return res
-      .status(400)
-      .json({ message: "Please fill all the required fields" });
-  }
+
   const job = await Job.create({
     title,
     description,
@@ -51,6 +36,7 @@ export const createJobByAdmin = asyncHandler(async (req, res) => {
     isRemote,
     createdBy: userId,
   });
+
   const notification = new Notification({
     recipient: userId,
     type: "job_related",
@@ -58,9 +44,9 @@ export const createJobByAdmin = asyncHandler(async (req, res) => {
     relatedJob: job._id,
     relatedCompany: companyId,
   });
-  //console.log(notification);
 
   await notification.save();
+
   return res.status(201).json({
     message: "Job created successfully",
     job,
@@ -86,10 +72,14 @@ export const getAdminJobs = asyncHandler(async (req, res) => {
 //3. get a job by id for users
 export const getJobById = asyncHandler(async (req, res) => {
   const jobId = req.params.id;
-  const job = await Job.findById(jobId).populate({
-    path: "applications",
-    createdAt: -1,
-  });
+  const job = await Job.findById(jobId)
+    .populate({
+      path: "applications",
+      createdAt: -1,
+    })
+    .populate({
+      path: "company",
+    });
 
   if (!job) return res.status(404).json({ message: "Job not found" });
   return res.status(200).json({
@@ -115,7 +105,7 @@ export const getAllJobs = asyncHandler(async (req, res) => {
     createdAt: -1,
   });
   if (jobs.length === 0) {
-    return res.status(404).json({ message: "No jobs found" });
+    console.warn("no jobs found");
   }
   return res.status(200).json({
     message: "Jobs fetched successfully",

@@ -1,26 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-
+import { useDispatch, useSelector } from "react-redux";
+import { setSingleJob } from "@/redux/jobSlice";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { JOB_API } from "@/utils/constant";
 const JobDetails = () => {
-  const singleJob = {
-    title: "Frontend Developer",
-    postion: 2,
-    jobType: "Full Time",
-    salary: 12,
-    location: "Remote",
-    description:
-      "We're looking for a skilled React developer to join our team and build scalable web applications.",
-    experience: 2,
-    applications: ["user1", "user2"],
-    createdAt: new Date().toISOString(),
-    company: "TechNova Pvt Ltd",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_TV_2015.png",
-  };
+  const params = useParams();
+  const jobId = params.id;
+  const dispatch = useDispatch();
+  const { user } = useSelector((store) => store.auth);
+  const { singleJob } = useSelector((store) => store.job);
+  console.log(singleJob);
 
-  const [isApplied, setIsApplied] = useState(false);
+  useEffect(() => {
+    const fetchSingleJob = async () => {
+      try {
+        const res = await axios.get(`${JOB_API}/get-job/${jobId}`, {
+          withCredentials: true,
+        });
+        if (res.data.success) {
+          dispatch(setSingleJob(res.data.job));
+        }
+        // console.log(dispatch(setSingleJob(res.data.job)));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchSingleJob();
+  }, [jobId, user?._id, dispatch]);
 
+  const isIntiallyApplied =
+    singleJob?.applications?.some(
+      (application) => application.applicant === user._id
+    ) || false;
+  const [isApplied, setIsApplied] = useState(isIntiallyApplied);
   const applyJobHandler = () => {
     setIsApplied(true);
     alert("✅ Successfully applied for the job!");
@@ -42,17 +58,16 @@ const JobDetails = () => {
           <div className="bg-white p-6 rounded-xl shadow-md flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="flex items-center gap-4">
               <img
-                src={singleJob.logo}
+                //src={singleJob.logo || "https://github.com/shadcn.png"}
+                src={"https://github.com/shadcn.png"}
                 alt="Company Logo"
                 className="w-14 h-14 rounded-md object-contain"
               />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {singleJob?.title}
+                  {singleJob?.company?.name}
                 </h1>
-                <p className="text-sm text-gray-600 mt-1">
-                  {singleJob.company}
-                </p>
+                <p className="text-sm text-gray-600 mt-1"></p>
               </div>
             </div>
 
@@ -77,7 +92,7 @@ const JobDetails = () => {
           {/* Tags */}
           <div className="flex gap-3 flex-wrap">
             <Badge variant="outline" className="text-blue-700 font-medium">
-              {singleJob?.postion} Position{singleJob?.postion > 1 && "s"}
+              <p>{singleJob?.position}</p>
             </Badge>
             <Badge variant="outline" className="text-red-600 font-medium">
               {singleJob?.jobType}
@@ -103,8 +118,8 @@ const JobDetails = () => {
                 {singleJob?.description}
               </p>
               <p>
-                <span className="font-semibold text-gray-900">Experience:</span>{" "}
-                {singleJob?.experience} yrs
+                <span className="font-semibold text-gray-900">Experience:</span>
+                {singleJob?.experienceLevel} level
               </p>
               <p>
                 <span className="font-semibold text-gray-900">Salary:</span> ₹{" "}
@@ -112,11 +127,16 @@ const JobDetails = () => {
               </p>
               <p>
                 <span className="font-semibold text-gray-900">Applicants:</span>{" "}
-                {singleJob?.applications?.length || 0}
+                {singleJob?.applications?.length === 0
+                  ? "Not applied by anyone yet"
+                  : `${singleJob?.applications?.length} Applicant${
+                      singleJob?.applications?.length > 1 ? "s" : ""
+                    }`}
               </p>
+
               <p>
                 <span className="font-semibold text-gray-900">Posted On:</span>{" "}
-                {new Date(singleJob?.createdAt).toLocaleDateString()}
+                {new Date(singleJob?.createdAt).toLocaleDateString() || "now"}
               </p>
             </div>
           </div>

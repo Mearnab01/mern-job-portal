@@ -1,7 +1,10 @@
 import React from "react";
 import LatestJobCard from "./LatestJobCard";
+import { useSelector } from "react-redux";
 
 const LatestJob = () => {
+  const { allJobs } = useSelector((store) => store.job);
+
   return (
     <div className="bg-gradient-to-t from-[#babaff] to-white dark:from-gray-800 dark:to-gray-900 min-h-[80vh] overflow-hidden">
       {/* Heading */}
@@ -11,9 +14,16 @@ const LatestJob = () => {
         </h1>
         {/* Job Listings */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <LatestJobCard key={index} />
-          ))}
+          {allJobs.length > 0 ? (
+            allJobs.map((job) => {
+              return <LatestJobCard key={job._id} job={job} />;
+            })
+          ) : (
+            <div className="flex items-center text-center text-gray-500 dark:text-gray-400 py-10">
+              <span className="text-5xl mb-2">❌</span>
+              <p className="text-xl font-medium">No jobs found</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

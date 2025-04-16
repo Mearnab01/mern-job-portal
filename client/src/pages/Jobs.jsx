@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import FilterCard from "@/components/FilterCard";
 import Job from "@/components/Job";
 import { motion } from "framer-motion";
-import { filterJobs } from "@/demoData";
 import {
   Pagination,
   PaginationContent,
@@ -11,16 +10,19 @@ import {
   PaginationNext,
 } from "@/components/ui/pagination";
 import MobileFilterCard from "@/responsive/MobileFilterCard";
+import { useSelector } from "react-redux";
 
 const Jobs = () => {
+  const { allJobs } = useSelector((store) => store.job);
+
   // pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const jobsPerPage = 6;
 
-  const totalPages = Math.ceil(filterJobs.length / jobsPerPage);
+  const totalPages = Math.ceil(allJobs.length / jobsPerPage);
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-  const currentJobs = filterJobs.slice(indexOfFirstJob, indexOfLastJob);
+  const currentJobs = allJobs.slice(indexOfFirstJob, indexOfLastJob);
 
   const handlePrev = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -50,7 +52,7 @@ const Jobs = () => {
               <MobileFilterCard />
             </div>
 
-            {filterJobs.length <= 0 ? (
+            {allJobs.length === 0 ? (
               <div className="text-center text-gray-600 mt-10">
                 <p className="text-lg font-medium">🔍 No jobs found</p>
                 <p className="text-sm mt-2">

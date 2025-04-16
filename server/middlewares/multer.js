@@ -7,6 +7,10 @@ export const upload = multer({
   { name: "profilePicture", maxCount: 1 },
   { name: "resume", maxCount: 1 },
 ]);
+export const applicationUpload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+}).fields([{ name: "resume", maxCount: 1 }]);
 
 /*
 // Configure multer storage

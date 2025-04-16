@@ -182,14 +182,14 @@ const UpdateProfile = ({ user }) => {
               <Label className="text-right">Photo</Label>
               <div className="col-span-3 relative">
                 <div
-                  className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500 cursor-pointer"
+                  className="w-24 h-24 rounded-full overflow-hidden border-2 border-blue-500 cursor-pointer"
                   onClick={() => fileRef.current?.click()}
                 >
                   <Avatar className="w-full h-full">
                     <AvatarImage
                       src={imageUrl || formData.profilePicture}
                       alt="profile"
-                      className="object-cover w-full h-full"
+                      className="object-contain w-full h-full"
                     />
                     <AvatarFallback>{user.fullname?.charAt(0)}</AvatarFallback>
                   </Avatar>

@@ -12,27 +12,35 @@ import {
   CardFooter,
   CardDescription,
 } from "./ui/card";
-import { formatDistanceToNowStrict } from "date-fns";
 
 const Job = ({ job }) => {
   const navigate = useNavigate();
 
-  const getTimeAgo = (date) => {
-    const distance = formatDistanceToNowStrict(new Date(date), {
-      addSuffix: true,
-    });
+  const daysAgoFunction = (mongodbTime) => {
+    if (!mongodbTime) return null;
+    const createdAt = new Date(mongodbTime);
+    const currentTime = new Date();
 
-    if (distance.includes("less than") || distance.includes("seconds")) {
-      return "Just now";
-    }
+    const currentDateString = currentTime.toLocaleDateString();
+    const createdAtDateString = createdAt.toLocaleDateString();
 
-    return distance;
+    if (currentDateString === createdAtDateString) return 0;
+
+    const timeDifference = currentTime - createdAt;
+    return Math.floor(timeDifference / (1000 * 60 * 60 * 24));
   };
+  const daysAgo = daysAgoFunction(job?.createdAt);
 
   return (
     <Card className="shadow-md border">
       <CardHeader className="flex flex-row items-center justify-between p-4">
-        <p className="text-sm text-gray-500">{getTimeAgo(job?.createdAt)}</p>
+        <p className="text-sm text-gray-500">
+          {daysAgo === 0
+            ? "Today"
+            : daysAgo === null
+            ? "Invalid date"
+            : `${daysAgo} days ago`}
+        </p>
         <Button variant="outline" size="icon" className="rounded-full">
           <Bookmark size={18} />
         </Button>
@@ -56,7 +64,7 @@ const Job = ({ job }) => {
 
         <div className="flex flex-wrap gap-2 mt-4">
           <Badge variant="outline" className="text-blue-700 font-semibold">
-            {job?.position} Positions
+            {job?.position}
           </Badge>
           <Badge variant="outline" className="text-[#F83002] font-semibold">
             {job?.jobType}
