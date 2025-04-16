@@ -11,15 +11,13 @@ const Profile = () => {
   const [imagePreview, setImagePreview] = useState(
     user?.profile?.profilePicture || "https://github.com/shadcn.png"
   );
-
-  // Update image preview whenever user profile picture is updated
   useEffect(() => {
     if (user?.profile?.profilePicture) {
       setImagePreview(user.profile.profilePicture);
     }
   }, [user?.profile?.profilePicture]);
 
-  const isResume = !!user?.resume;
+  const isResume = !!user?.profile?.resume && user?.profile?.resumeOriginalName;
 
   return (
     <div className="bg-gray-100 min-h-screen py-10 px-4">
@@ -35,7 +33,7 @@ const Profile = () => {
           </Avatar>
           <h1 className="text-2xl font-semibold mb-1">{user.fullname}</h1>
           <div className="flex flex-col gap-2 w-full text-left text-sm mt-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 read-only:bg-gray-200">
               <Mail className="h-4 w-4 text-gray-600" />
               <span>{user.email}</span>
             </div>
@@ -48,14 +46,7 @@ const Profile = () => {
               <strong className="m-2 text-de_primary">{user.role}</strong>
             </div>
             <div className="flex items-center gap-2">
-              <ScanEye className="h-4 w-4 text-gray-600" />
-              {user?.profile?.bio ? (
-                <span className="text-gray-700 text-sm">
-                  {user.profile.bio}
-                </span>
-              ) : (
-                <span className="text-gray-400 italic">Add your bio</span>
-              )}
+              <UpdateProfile user={user} setUser={setUser} />
             </div>
           </div>
         </div>
@@ -96,23 +87,26 @@ const Profile = () => {
               <div className="text-md font-bold">Resume</div>
               {isResume ? (
                 <a
-                  href={user.resume}
+                  href={user.profile?.resume}
                   target="_blank"
-                  rel="noreferrer"
                   className="text-blue-500 hover:underline"
                 >
-                  {user.resumeOriginalName}
+                  {user.profile?.resumeOriginalName}
                 </a>
               ) : (
-                <span>NA</span>
+                <span className="text-gray-400 italic">Add your resume</span>
               )}
             </div>
           </div>
 
           {/* Update Bio Section (Full Width) */}
           <div className="bg-white p-6 rounded-2xl shadow-md w-full">
-            <h2 className="text-lg font-semibold mb-4">Edit Bio</h2>
-            <UpdateProfile user={user} setUser={setUser} />
+            <h2 className="text-lg font-semibold mb-4">Bio</h2>
+            {user?.profile?.bio ? (
+              <span className="text-gray-700 text-sm">{user.profile.bio}</span>
+            ) : (
+              <span className="text-gray-400 italic">Add your bio</span>
+            )}
           </div>
         </div>
       </div>

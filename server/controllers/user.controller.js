@@ -6,6 +6,7 @@ import { asyncHandler } from "../middlewares/errorHandler.js";
 import bcrypt from "bcryptjs";
 
 import { v2 as cloudinary } from "cloudinary";
+import getDataUri from "../middlewares/dataUri.js";
 //1. register user
 export const registerUser = asyncHandler(async (req, res) => {
   const { fullname, email, password, role, phoneNumber } = req.body;
@@ -88,6 +89,8 @@ export const loginUser = asyncHandler(async (req, res) => {
       bio: user.profile?.bio || "",
       skills: user.profile?.skills || [],
       resume: user.profile?.resume || "",
+      resumeOriginalName: user.profile?.resumeOriginalName || "",
+      profilePicture: user.profile?.profilePicture || "",
     },
   };
   return generateToken(res, loggedInUser, `Welcome back ${user.fullname}`);
@@ -112,48 +115,59 @@ export const logoutUser = asyncHandler(async (req, res) => {
 //4. update user
 export const updateUser = asyncHandler(async (req, res) => {
   const { fullname, email, phoneNumber, bio, skills } = req.body;
-  let { profilePicture } = req.body;
-
-  if (!fullname && !email && !phoneNumber && !bio && !skills) {
-    return res.status(400).json({
-      message: "At least one field is required to update",
-      success: false,
-    });
-  }
-  const file = req.file;
-
+  const files = req.files;
   const userId = req.id;
+
   const user = await User.findById(userId);
   if (!user) {
     return res.status(404).json({ message: "User not found", success: false });
   }
-  if (profilePicture) {
+
+  // === Profile Picture ===
+  if (files?.profilePicture?.[0]) {
+    const profileFile = files.profilePicture[0];
     if (user.profile.profilePicture) {
       await cloudinary.uploader.destroy(
         user.profile.profilePicture.split("/").pop().split(".")[0]
       );
-      const uploadResponse = await cloudinary.uploader.upload(profilePicture);
-      profilePicture = uploadResponse.secure_url;
     }
-  }
-  let skillsArray = user.profile.skills || [];
-  skillsArray = skills
-    .split(",") // Split the string by commas
-    .map((skill) => skill.trim().toLowerCase()) // Trim spaces and convert to lowercase
-    .filter(Boolean); // Remove any empty strings
 
-  // Remove duplicates using a Set
-  skillsArray = [...new Set(skillsArray)];
+    const fileUri = getDataUri(profileFile);
+    const uploaded = await cloudinary.uploader.upload(fileUri.content, {
+      resource_type: "auto",
+      folder: "profile_pictures",
+    });
+
+    user.profile.profilePicture = uploaded.secure_url;
+  }
+
+  // === Resume ===
+  if (files?.resume?.[0]) {
+    const resumeFile = files.resume[0];
+    const fileUri = getDataUri(resumeFile);
+    const uploadedResume = await cloudinary.uploader.upload(fileUri.content, {
+      resource_type: "auto",
+      folder: "resumes",
+      format: "pdf",
+    });
+
+    user.profile.resume = uploadedResume.secure_url;
+    user.profile.resumeOriginalName = resumeFile.originalname;
+  }
+
+  // === Other Fields ===
   if (fullname) user.fullname = fullname;
   if (email) user.email = email;
   if (phoneNumber) user.phoneNumber = phoneNumber;
   if (bio) user.profile.bio = bio;
-  if (skillsArray) user.profile.skills = skillsArray;
-  if (profilePicture) user.profile.profilePicture = profilePicture;
 
-  // Handle resume file upload
-  if (file) {
-    user.profile.resume = file.path;
+  if (skills) {
+    let skillsArray = skills
+      .split(",")
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    skillsArray = [...new Set(skillsArray)];
+    user.profile.skills = skillsArray;
   }
 
   await user.save();
@@ -169,6 +183,7 @@ export const updateUser = asyncHandler(async (req, res) => {
       skills: user.profile?.skills || [],
       profilePicture: user.profile?.profilePicture || "",
       resume: user.profile?.resume || "",
+      resumeOriginalName: user.profile?.resumeOriginalName || "",
     },
   };
 

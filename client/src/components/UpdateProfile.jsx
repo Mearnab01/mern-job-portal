@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import { Check, Loader2, Upload } from "lucide-react";
 import axios from "axios";
 import { USER_API } from "@/utils/constant";
 import { useDispatch } from "react-redux";
@@ -24,42 +24,83 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const UpdateProfile = ({ user }) => {
   const dispatch = useDispatch();
   const fileRef = useRef(null);
+  const resumeRef = useRef(null);
+  const { handleImageChange, imageUrl } = usePreviewImg();
 
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [resumeSelected, setResumeSelected] = useState(false);
+  const [resumeFileName, setResumeFileName] = useState(
+    user?.profile?.resumeOriginalName || ""
+  );
+  useEffect(() => {
+    setResumeSelected(false); // reset on load
+    setResumeFileName(user?.profile?.resumeOriginalName || "");
+  }, [user]);
 
   const [formData, setFormData] = useState({
     fullname: user.fullname,
     email: user.email,
     phoneNumber: user.phoneNumber,
     bio: user.profile.bio || "",
-    skills: user?.profile?.skills?.map((skill) => skill) || "",
-    profilePicture: user.profile.profilePhoto,
+    skills: user?.profile?.skills?.join(", ") || "",
+    profilePicture: imageUrl || user?.profile.profilePicture,
+    resumeFile: user?.profile.resume || null,
   });
-
-  const { handleImageChange, imageUrl } = usePreviewImg();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleResumeChange = (e) => {
+    const file = e.target.files[0];
+    if (
+      file &&
+      (file.type === "application/pdf" ||
+        file.type.startsWith("application/msword"))
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        resumeFile: file, // Set resume file in state
+      }));
+      setResumeSelected(true); // show green check
+      setResumeFileName(file.name);
+    } else {
+      toast.error("Invalid resume file. Please upload a PDF or Word document.");
+      setFormData((prev) => ({
+        ...prev,
+        resumeFile: null,
+      }));
+      setResumeSelected(false);
+      setResumeFileName("");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const updatedData = {
-      fullname: formData.fullname,
-      email: formData.email,
-      phoneNumber: formData.phoneNumber,
-      bio: formData.bio,
-      skills: formData.skills,
-      profilePicture: imageUrl || formData.profilePicture,
-    };
+    const updatedData = new FormData();
+    updatedData.append("fullname", formData.fullname);
+    updatedData.append("email", formData.email);
+    updatedData.append("phoneNumber", formData.phoneNumber);
+    updatedData.append("bio", formData.bio);
+    updatedData.append("skills", formData.skills);
+
+    // Append profile picture if changed
+    if (fileRef.current && fileRef.current.files[0]) {
+      updatedData.append("profilePicture", fileRef.current.files[0]);
+    }
+
+    // Append resume file if selected
+    if (formData.resumeFile) {
+      updatedData.append("resume", formData.resumeFile);
+    }
 
     try {
       const res = await axios.post(`${USER_API}/update-profile`, updatedData, {
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
 
@@ -151,9 +192,7 @@ const UpdateProfile = ({ user }) => {
             {/* Profile Picture */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Photo</Label>
-
               <div className="col-span-3 relative">
-                {/* Clickable Avatar */}
                 <div
                   className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500 cursor-pointer"
                   onClick={() => fileRef.current?.click()}
@@ -167,8 +206,6 @@ const UpdateProfile = ({ user }) => {
                     <AvatarFallback>{user.fullname?.charAt(0)}</AvatarFallback>
                   </Avatar>
                 </div>
-
-                {/* Hidden Input */}
                 <Input
                   type="file"
                   accept="image/*"
@@ -177,6 +214,43 @@ const UpdateProfile = ({ user }) => {
                   className="hidden"
                 />
               </div>
+            </div>
+            {/* Resume */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Resume</Label>
+
+              <div className="col-span-3 flex items-center justify-between">
+                <div
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => resumeRef.current.click()}
+                >
+                  {resumeSelected ? (
+                    <Check className="w-6 h-6 text-green-500" />
+                  ) : (
+                    <Upload className="w-6 h-6 text-muted-foreground" />
+                  )}
+
+                  {resumeFileName ? (
+                    <p className="italic text-sm text-blue-500 hover:underline">
+                      {resumeSelected
+                        ? `selected: ${resumeFileName}`
+                        : `current: ${resumeFileName}`}
+                    </p>
+                  ) : (
+                    <p className="italic text-sm text-gray-400">
+                      No resume uploaded
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <Input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={handleResumeChange}
+                ref={resumeRef}
+                className="hidden"
+              />
             </div>
           </div>
 

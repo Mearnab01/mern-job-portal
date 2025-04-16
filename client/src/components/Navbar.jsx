@@ -17,7 +17,6 @@ import MobileNav from "@/responsive/MobileNav";
 
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
-  console.log(user);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -126,8 +125,10 @@ const Navbar = () => {
                   </Avatar>
                   <div>
                     <h4 className="font-medium">{user?.name}</h4>
-                    <p className="text-sm text-gray-500 truncate flex-wrap">
-                      {user?.profile?.bio}
+                    <p className="text-sm text-gray-500">
+                      {user?.profile?.bio.length > 20
+                        ? user?.profile?.bio.slice(0, 20) + "..."
+                        : user?.profile?.bio}
                     </p>
                   </div>
                 </div>

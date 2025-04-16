@@ -1,7 +1,10 @@
-import DataUri from "datauri";
+import DatauriParser from "datauri/parser.js";
+import path from "path";
 
-export const getDataUri = (file) => {
-  const dataUri = new DataUri();
-  const extName = path.extname(file.originalname).toString();
-  return dataUri.format(extName, file.buffer);
+const getDataUri = (file) => {
+  const parser = new DatauriParser();
+  const extName = path.extname(file.originalname).toString(); // e.g. .pdf
+  return parser.format(extName, file.buffer); // converts buffer to base64
 };
+
+export default getDataUri;
