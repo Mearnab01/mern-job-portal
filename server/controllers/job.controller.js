@@ -115,45 +115,96 @@ export const getAllJobs = asyncHandler(async (req, res) => {
 
 // 5. Delete a job by admin
 export const deleteJobByAdmin = asyncHandler(async (req, res) => {
-  const jobId = req.params.id;
+  const jobId = req.body.id; // 🔥 ID now comes from the request body
+
+  if (!jobId) {
+    return res
+      .status(400)
+      .json({ message: "Job ID is required", success: false });
+  }
 
   const job = await Job.findById(jobId);
   if (!job) {
     return res.status(404).json({ message: "Job not found", success: false });
   }
 
-  // Step 1: Get all users who saved or applied for the job
+  // Step 1: Find all users who saved or applied for the job
   const affectedUsers = await User.find({
     $or: [{ savedJobs: jobId }, { appliedJobs: jobId }],
   });
-  console.log("Affected Users:", affectedUsers);
-  // Step 2: Remove the job from all users' saved job lists
+
+  console.log(
+    "Affected Users:",
+    affectedUsers.map((u) => u.email)
+  );
+
+  // Step 2: Remove the job from users' saved jobs
   await User.updateMany({ savedJobs: jobId }, { $pull: { savedJobs: jobId } });
 
-  // Step 3: Delete all applications related to this job
+  // Step 3: Delete related applications
   await Application.deleteMany({ job: jobId });
 
   // Step 4: Delete the job itself
   await Job.findByIdAndDelete(jobId);
 
-  // Step 5: Delete all notifications related to this job
+  // Step 5: Delete related notifications
   await Notification.deleteMany({ relatedJob: jobId });
 
-  // Step 6: Send a new notification to affected users
+  // Step 6: Notify affected users
   const notifications = affectedUsers.map((user) => ({
     recipient: user._id,
     message: `The job "${job.title}" has been deleted by the admin.`,
     type: "job_related",
     relatedCompany: job.company,
     relatedJob: null,
-    sendAt: new Date(), // Set the sendAt date to now
+    sendAt: new Date(),
     isRead: false,
   }));
   await Notification.insertMany(notifications);
 
-  // Send a success response
   res.status(200).json({
-    message: "The job was deleted, and all affected users have been notified.",
+    message: "Job deleted and users notified successfully.",
     success: true,
   });
+});
+
+// 6. suggessted job
+export const getSuggestedJobs = asyncHandler(async (req, res) => {
+  const { jobId } = req.params;
+  const originalJob = await Job.findById(jobId);
+
+  if (!originalJob) {
+    res.status(404);
+    throw new Error("Job not found");
+  }
+
+  const { title, description, requirements } = originalJob;
+
+  // Build a clean skill set
+  const skills = [...requirements, title, description]
+    .join(" ")
+    .toLowerCase()
+    .match(/\b[a-z]+\b/g)
+    .filter((word) => word.length > 3);
+
+  const skillSet = Array.from(new Set(skills)); // remove duplicates
+
+  // Match other jobs based on shared skills
+  const allJobs = await Job.find({
+    _id: { $ne: jobId },
+    isActive: true,
+  }).populate("company", "name");
+
+  const relevantJobs = allJobs.filter((job) => {
+    const jobText = [...job.requirements, job.title, job.description]
+      .join(" ")
+      .toLowerCase();
+
+    const sharedWords = skillSet.filter((skill) => jobText.includes(skill));
+
+    // Only include jobs with at least 2 shared meaningful skills
+    return sharedWords.length >= 2;
+  });
+
+  res.status(200).json(relevantJobs);
 });

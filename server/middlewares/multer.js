@@ -1,4 +1,5 @@
 import multer from "multer";
+import path from "path";
 const storage = multer.memoryStorage();
 export const upload = multer({
   storage,
@@ -7,14 +8,13 @@ export const upload = multer({
   { name: "profilePicture", maxCount: 1 },
   { name: "resume", maxCount: 1 },
 ]);
-export const applicationUpload = multer({
+export const logoUpload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 },
-}).fields([{ name: "resume", maxCount: 1 }]);
+}).single("file");
 
-/*
 // Configure multer storage
-const storage = multer.diskStorage({
+/* const logostorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
   },
@@ -23,9 +23,7 @@ const storage = multer.diskStorage({
   },
 });
 
-export const singleUpload = multer({
-  storage: storage,
+export const logoUpload = multer({
+  storage: logostorage,
   limits: { fileSize: 5 * 1024 * 1024 },
-}).single("resume");
-
-export default singleUpload; */
+}).single("file"); */

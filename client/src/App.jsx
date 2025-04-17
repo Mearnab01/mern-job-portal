@@ -14,6 +14,8 @@ import CompanySetup from "./components/admin/CompanySetup";
 import AdminJobs from "./components/admin/AdminJobs";
 import Applicants from "./components/admin/Applicants";
 import PostJob from "./components/admin/PostJob";
+import SuggestedJobs from "./components/SuggestedJobs";
+import CompanyCreate from "./components/admin/CompanyCreate";
 
 const App = () => {
   const Layout = () => {
@@ -34,10 +36,12 @@ const App = () => {
         { path: "/jobs", element: <Jobs /> },
         { path: "/notifications", element: <Notification /> },
         { path: "/my-profile", element: <Profile /> },
+        { path: "/details", element: <SuggestedJobs /> },
         { path: "/details/:id", element: <JobDetails /> },
 
         // ✅ Admin routes (no ProtectedRoute yet)
         { path: "/admin/companies", element: <Companies /> },
+        { path: "/admin/companies/create", element: <CompanyCreate /> },
         { path: "/admin/companies/:id", element: <CompanySetup /> },
         { path: "/admin/jobs", element: <AdminJobs /> },
         { path: "/admin/jobs/create", element: <PostJob /> },

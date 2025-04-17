@@ -1,45 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import CompaniesTable from "./CompaniesTable";
 import { useNavigate } from "react-router-dom";
-
-const dummyCompanies = [
-  {
-    id: "c1",
-    name: "Tata Consultancy Services",
-    location: "Mumbai",
-    industry: "IT Services",
-    createdAt: "2025-04-01",
-  },
-  {
-    id: "c2",
-    name: "Infosys",
-    location: "Bengaluru",
-    industry: "Software",
-    createdAt: "2025-03-20",
-  },
-  {
-    id: "c3",
-    name: "Zomato",
-    location: "Gurugram",
-    industry: "Food Tech",
-    createdAt: "2025-02-15",
-  },
-];
+import useGetAllCompanies from "@/hooks/useGetAllCompanies";
+import { useDispatch } from "react-redux";
+import { setSearchCompanyByText } from "@/redux/companySlice";
+import { motion } from "framer-motion";
 
 const Companies = () => {
+  useGetAllCompanies();
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const filteredCompanies = dummyCompanies.filter((company) =>
-    company.name.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    dispatch(setSearchCompanyByText(search));
+  }, [search]);
 
   return (
-    <div className="min-h-screen">
+    <motion.div
+      className="min-h-screen"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
       <div className="max-w-6xl mx-auto px-4 my-10">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <motion.div
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
           <Input
             className="w-full sm:w-[300px]"
             placeholder="Filter by company name"
@@ -49,10 +41,17 @@ const Companies = () => {
           <Button onClick={() => navigate("/admin/companies/create")}>
             + New Company
           </Button>
-        </div>
-        <CompaniesTable companies={filteredCompanies} />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+        >
+          <CompaniesTable />
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

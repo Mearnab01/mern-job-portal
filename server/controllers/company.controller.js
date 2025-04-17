@@ -2,6 +2,9 @@ import { asyncHandler } from "../middlewares/errorHandler.js";
 import { Company } from "../models/company.model.js";
 import { Job } from "../models/job.model.js";
 import { Application } from "../models/application.model.js";
+
+import { v2 as cloudinary } from "cloudinary";
+import getDataUri from "../middlewares/dataUri.js";
 // 1. Create a company
 export const createCompany = asyncHandler(async (req, res) => {
   const { companyName } = req.body;
@@ -36,7 +39,57 @@ export const createCompany = asyncHandler(async (req, res) => {
 
 // 2. Update company
 export const updateCompany = asyncHandler(async (req, res) => {
-  // your logic here
+  const file = req.file;
+  const { name, description, website, location } = req.body;
+  //console.log("📸 File:", file);
+  const company = await Company.findById(req.params.id);
+  if (!company) {
+    return res.status(404).json({
+      message: "Company not found.",
+      success: false,
+    });
+  }
+
+  // === Cloudinary Upload using getDataUri ===
+  let updatedLogoUrl = company.logo;
+
+  if (file) {
+    // Optional: Delete previous logo
+    if (company.logo) {
+      const publicId = company.logo.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(`company_logo/${publicId}`);
+    }
+
+    const fileUri = getDataUri(file);
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+      resource_type: "auto",
+      folder: "company_logo",
+    });
+
+    updatedLogoUrl = cloudResponse.secure_url;
+  }
+
+  const updateData = {
+    name: name || company.name,
+    description,
+    website,
+    location,
+    logo: updatedLogoUrl,
+  };
+
+  const updatedCompany = await Company.findByIdAndUpdate(
+    req.params.id,
+    updateData,
+    {
+      new: true,
+    }
+  );
+
+  return res.status(200).json({
+    message: "Company information updated successfully.",
+    success: true,
+    company: updatedCompany,
+  });
 });
 
 // 3. Get all companies
@@ -76,7 +129,7 @@ export const getCompanyById = asyncHandler(async (req, res) => {
 });
 
 // 5. Delete company
-export const deleteCompany = async (req, res) => {
+export const deleteCompany = asyncHandler(async (req, res) => {
   try {
     const companyId = req.params.id;
 
@@ -108,4 +161,21 @@ export const deleteCompany = async (req, res) => {
     console.error("Error deleting company:", error);
     res.status(500).json({ message: "Server error", success: false });
   }
-};
+});
+
+// a powerful postman lesson
+export const test = asyncHandler(async (req, res) => {
+  const { name } = req.body;
+  const file = req.file;
+  if (!file) {
+    console.error("file not found");
+    return res.json({
+      success: false,
+    });
+  }
+  console.log(file);
+  console.log(name);
+  return res.json({
+    success: true,
+  });
+});

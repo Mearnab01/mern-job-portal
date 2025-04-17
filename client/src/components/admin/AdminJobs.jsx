@@ -1,14 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 import AdminJobsTable from "./AdminJobsTable";
 import { motion } from "framer-motion";
+import useGetAllAdminJobs from "@/hooks/useGetAllAdminJobs";
+import { setSearchJobByText } from "@/redux/jobSlice";
+import { useDispatch } from "react-redux";
 
 const AdminJobs = () => {
   const [input, setInput] = useState("");
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
+  useGetAllAdminJobs();
+  useEffect(() => {
+    dispatch(setSearchJobByText(input));
+  }, [input]);
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <motion.div
@@ -51,7 +58,7 @@ const AdminJobs = () => {
           </div>
 
           {/* Job Table */}
-          <AdminJobsTable searchQuery={input} />
+          <AdminJobsTable />
         </motion.div>
       </motion.div>
     </div>

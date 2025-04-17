@@ -4,9 +4,13 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useNavigate, useParams } from "react-router-dom";
+import { COMPANY_API } from "@/utils/constant";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 
 const CompanySetup = () => {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params.id;
   const navigate = useNavigate();
 
   const [input, setInput] = useState({
@@ -19,14 +23,30 @@ const CompanySetup = () => {
 
   const [loading, setLoading] = useState(false);
 
+  // Optional: pre-fill form if editing an existing company
   useEffect(() => {
-    const fetchedCompany = {
-      name: "Example Inc",
-      description: "We build cool stuff.",
-      website: "https://example.com",
-      location: "San Francisco, CA",
+    const fetchCompany = async () => {
+      try {
+        const res = await axios.get(`${COMPANY_API}/${id}`, {
+          withCredentials: true,
+        });
+        if (res.data.success) {
+          const { name, description, website, location } = res.data.company;
+          setInput((prev) => ({
+            ...prev,
+            name,
+            description,
+            website,
+            location,
+          }));
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to fetch company details");
+      }
     };
-    setInput({ ...fetchedCompany, file: null });
+
+    if (id) fetchCompany();
   }, [id]);
 
   const handleChange = (e) => {
@@ -40,17 +60,35 @@ const CompanySetup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const formData = new FormData();
-    Object.entries(input).forEach(([key, value]) => {
-      if (value) formData.append(key, value);
-    });
+    formData.append("name", input.name);
+    formData.append("description", input.description);
+    formData.append("website", input.website);
+    formData.append("location", input.location);
+    if (input.file) {
+      formData.append("file", input.file);
+    }
 
-    setLoading(true);
+    try {
+      setLoading(true);
+      const res = await axios.put(`${COMPANY_API}/update/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
 
-    setTimeout(() => {
+      if (res.data.success) {
+        toast.success(res.data.message);
+        navigate("/admin/companies");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    } finally {
       setLoading(false);
-      navigate("/admin/companies");
-    }, 1000);
+    }
   };
 
   return (
@@ -91,6 +129,7 @@ const CompanySetup = () => {
               name="description"
               value={input.description}
               onChange={handleChange}
+              required
             />
           </div>
 
@@ -101,6 +140,7 @@ const CompanySetup = () => {
               name="website"
               value={input.website}
               onChange={handleChange}
+              required
             />
           </div>
 
@@ -111,6 +151,7 @@ const CompanySetup = () => {
               name="location"
               value={input.location}
               onChange={handleChange}
+              required
             />
           </div>
 

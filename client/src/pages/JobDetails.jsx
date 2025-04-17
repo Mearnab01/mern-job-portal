@@ -6,14 +6,46 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSingleJob } from "@/redux/jobSlice";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { JOB_API } from "@/utils/constant";
+import { APPLICATION_API, JOB_API } from "@/utils/constant";
+import toast from "react-hot-toast";
+import SuggestedJobs from "@/components/SuggestedJobs";
+
 const JobDetails = () => {
   const params = useParams();
   const jobId = params.id;
   const dispatch = useDispatch();
+
   const { user } = useSelector((store) => store.auth);
   const { singleJob } = useSelector((store) => store.job);
-  console.log(singleJob);
+
+  const isInitiallyApplied =
+    user &&
+    singleJob?.applications?.some(
+      (application) => application.applicant === user._id
+    );
+
+  const [isApplied, setIsApplied] = useState(isInitiallyApplied || false);
+
+  const applyJobHandler = async () => {
+    try {
+      const res = await axios.get(`${APPLICATION_API}/apply/${jobId}`, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        setIsApplied(true);
+        const updatedSingleJob = {
+          ...singleJob,
+          applications: [...singleJob.applications, { applicant: user?._id }],
+        };
+        dispatch(setSingleJob(updatedSingleJob));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Something went wrong!");
+    }
+  };
 
   useEffect(() => {
     const fetchSingleJob = async () => {
@@ -21,44 +53,40 @@ const JobDetails = () => {
         const res = await axios.get(`${JOB_API}/get-job/${jobId}`, {
           withCredentials: true,
         });
+        //console.log(dispatch(setSingleJob(res.data.job)));
+
         if (res.data.success) {
           dispatch(setSingleJob(res.data.job));
+          setIsApplied(
+            res.data.job.applications.some(
+              (application) => application.applicant === user?._id
+            )
+          );
         }
-        // console.log(dispatch(setSingleJob(res.data.job)));
       } catch (error) {
-        console.log(error);
+        console.error(error);
+        toast.error(response.data.error.message);
       }
     };
     fetchSingleJob();
   }, [jobId, user?._id, dispatch]);
 
-  const isIntiallyApplied =
-    singleJob?.applications?.some(
-      (application) => application.applicant === user._id
-    ) || false;
-  const [isApplied, setIsApplied] = useState(isIntiallyApplied);
-  const applyJobHandler = () => {
-    setIsApplied(true);
-    alert("✅ Successfully applied for the job!");
-  };
-
-  const suggestedJobs = [
-    { title: "React Developer", company: "CodeLabs", location: "Remote" },
-    { title: "UI Designer", company: "PixelSoft", location: "Bangalore" },
-    { title: "Fullstack Engineer", company: "Webify", location: "Mumbai" },
-  ];
+  if (!user) {
+    return (
+      <div className="text-center text-gray-600 py-20">
+        Please login to view job details.
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto my-10 px-4">
-      {/* Main Layout: Stacked on mobile, side-by-side on md+ */}
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Left Side - Main Job Details */}
         <div className="flex-1 space-y-6">
           {/* Header */}
           <div className="bg-white p-6 rounded-xl shadow-md flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="flex items-center gap-4">
               <img
-                //src={singleJob.logo || "https://github.com/shadcn.png"}
                 src={"https://github.com/shadcn.png"}
                 alt="Company Logo"
                 className="w-14 h-14 rounded-md object-contain"
@@ -67,32 +95,33 @@ const JobDetails = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   {singleJob?.company?.name}
                 </h1>
-                <p className="text-sm text-gray-600 mt-1"></p>
               </div>
             </div>
 
-            <motion.div
-              whileHover={{ scale: isApplied ? 1 : 1.05 }}
-              className="mt-6 md:mt-0"
-            >
-              <Button
-                onClick={!isApplied ? applyJobHandler : null}
-                disabled={isApplied}
-                className={`rounded-lg px-6 py-2 text-white ${
-                  isApplied
-                    ? "bg-gray-500 cursor-not-allowed"
-                    : "bg-purple-700 hover:bg-purple-800"
-                }`}
+            {user.role === "student" && (
+              <motion.div
+                whileHover={{ scale: isApplied ? 1 : 1.05 }}
+                className="mt-6 md:mt-0"
               >
-                {isApplied ? "Already Applied" : "Apply Now"}
-              </Button>
-            </motion.div>
+                <Button
+                  onClick={!isApplied ? applyJobHandler : null}
+                  disabled={isApplied}
+                  className={`rounded-lg px-6 py-2 text-white ${
+                    isApplied
+                      ? "bg-gray-500 cursor-not-allowed"
+                      : "bg-purple-700 hover:bg-purple-800"
+                  }`}
+                >
+                  {isApplied ? "Already Applied" : "Apply Now"}
+                </Button>
+              </motion.div>
+            )}
           </div>
 
           {/* Tags */}
           <div className="flex gap-3 flex-wrap">
             <Badge variant="outline" className="text-blue-700 font-medium">
-              <p>{singleJob?.position}</p>
+              {singleJob?.position}
             </Badge>
             <Badge variant="outline" className="text-red-600 font-medium">
               {singleJob?.jobType}
@@ -118,7 +147,7 @@ const JobDetails = () => {
                 {singleJob?.description}
               </p>
               <p>
-                <span className="font-semibold text-gray-900">Experience:</span>
+                <span className="font-semibold text-gray-900">Experience:</span>{" "}
                 {singleJob?.experienceLevel} level
               </p>
               <p>
@@ -133,31 +162,16 @@ const JobDetails = () => {
                       singleJob?.applications?.length > 1 ? "s" : ""
                     }`}
               </p>
-
               <p>
                 <span className="font-semibold text-gray-900">Posted On:</span>{" "}
-                {new Date(singleJob?.createdAt).toLocaleDateString() || "now"}
+                {new Date(singleJob?.updatedAt).toLocaleDateString() || "now"}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Right Side - Suggested Jobs */}
-        <aside className="w-full lg:w-[300px] bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-lg font-semibold mb-4">Suggested Jobs</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-4">
-            {suggestedJobs.map((job, index) => (
-              <div
-                key={index}
-                className="border p-3 rounded-lg hover:shadow transition cursor-pointer"
-              >
-                <h3 className="font-semibold text-gray-800">{job.title}</h3>
-                <p className="text-sm text-gray-500">{job.company}</p>
-                <p className="text-xs text-gray-400">{job.location}</p>
-              </div>
-            ))}
-          </div>
-        </aside>
+        {/* Suggested Jobs */}
+        <SuggestedJobs />
       </div>
     </div>
   );

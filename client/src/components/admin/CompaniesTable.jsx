@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,10 +12,29 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Edit2, MoreHorizontal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const CompaniesTable = ({ companies }) => {
+const CompaniesTable = () => {
   const navigate = useNavigate();
+  const { companies, searchCompanyByText } = useSelector(
+    (store) => store.company
+  );
+  //console.log(companies);
+  const [filterCompany, setFilterCompany] = useState(companies);
 
+  useEffect(() => {
+    const filteredCompany =
+      companies.length >= 0 &&
+      companies.filter((company) => {
+        if (!searchCompanyByText) {
+          return true;
+        }
+        return company?.name
+          ?.toLowerCase()
+          .includes(searchCompanyByText.toLowerCase());
+      });
+    setFilterCompany(filteredCompany);
+  }, [companies, searchCompanyByText]);
   return (
     <div className="overflow-x-auto rounded-xl border shadow-sm">
       <Table>
@@ -29,9 +48,9 @@ const CompaniesTable = ({ companies }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {companies.length > 0 ? (
-            companies.map((company) => (
-              <TableRow key={company.id}>
+          {filterCompany.length > 0 ? (
+            filterCompany.map((company) => (
+              <TableRow key={company._id}>
                 <TableCell>
                   <Avatar className="h-10 w-10">
                     <AvatarImage
@@ -53,7 +72,7 @@ const CompaniesTable = ({ companies }) => {
                     <PopoverContent className="w-32">
                       <div
                         onClick={() =>
-                          navigate(`/admin/companies/${company.id}`)
+                          navigate(`/admin/companies/${company._id}`)
                         }
                         className="flex items-center gap-2 hover:bg-muted px-2 py-1 rounded-md cursor-pointer"
                       >

@@ -7,7 +7,15 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { Bell, BriefcaseBusinessIcon, Home, LogOut, User2 } from "lucide-react";
+import {
+  Bell,
+  BriefcaseBusinessIcon,
+  Building2Icon,
+  Home,
+  LogOut,
+  Rocket,
+  User2,
+} from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "@/redux/authSlice";
 import { USER_API } from "@/utils/constant";
@@ -57,15 +65,24 @@ const Navbar = () => {
           {user?.role === "recruiter" ? (
             <>
               <Link
-                to="/admin/companies"
-                className="font-semibold hover:underline px-4 py-2 transition duration-200"
+                to="/"
+                className="font-semibold hover:underline px-4 py-2 transition duration-200 flex items-center"
               >
+                <Home className="w-4 h-4 mr-2" />
+                <span className="hidden md:inline">Home</span>
+              </Link>
+              <Link
+                to="/admin/companies"
+                className="font-semibold hover:underline px-4 py-2 transition duration-200 flex items-center"
+              >
+                <Building2Icon className="w-4 h-4 mr-2" />
                 Companies
               </Link>
               <Link
                 to="/admin/jobs"
-                className="font-semibold hover:underline px-4 py-2 transition duration-200"
+                className="font-semibold hover:underline px-4 py-2 transition duration-200 flex items-center"
               >
+                <Rocket className="w-4 h-4 mr-2" />
                 Jobs
               </Link>
             </>
@@ -135,18 +152,13 @@ const Navbar = () => {
                   </div>
                 </div>
                 <div className="mt-4 flex flex-col gap-2 text-gray-700">
-                  {user.role === "student" && (
-                    <Button
-                      asChild
-                      variant="link"
-                      className="justify-start px-0"
-                    >
-                      <Link to="/my-profile">
-                        <User2 className="w-4 h-4 mr-2" />
-                        View Profile
-                      </Link>
-                    </Button>
-                  )}
+                  <Button asChild variant="link" className="justify-start px-0">
+                    <Link to="/my-profile">
+                      <User2 className="w-4 h-4 mr-2" />
+                      View Profile
+                    </Link>
+                  </Button>
+
                   <Button
                     variant="link"
                     onClick={logoutHandler}

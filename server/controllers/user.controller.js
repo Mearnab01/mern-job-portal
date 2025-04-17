@@ -1,6 +1,4 @@
 import { User } from "../models/user.model.js";
-import { Job } from "../models/job.model.js";
-import { Application } from "../models/application.model.js";
 import { generateToken } from "../middlewares/generateTokenAndVerify.js";
 import { asyncHandler } from "../middlewares/errorHandler.js";
 import bcrypt from "bcryptjs";

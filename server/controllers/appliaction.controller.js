@@ -3,21 +3,11 @@ import { Application } from "../models/application.model.js";
 import { Notification } from "../models/notification.model.js";
 import { User } from "../models/user.model.js";
 import { Job } from "../models/job.model.js";
-import { v2 as cloudinary } from "cloudinary";
-import getDataUri from "../middlewares/dataUri.js";
 
 //1. application for a job
 export const applyForJob = asyncHandler(async (req, res) => {
   const jobId = req.params.id;
   const userId = req.id;
-  const files = req.files;
-  //console.log("Uploaded Files:", req.files);
-  if (!files?.resume?.[0]) {
-    return res.status(400).json({
-      message: "All fields are required",
-      success: false,
-    });
-  }
 
   const user = await User.findById(userId);
   const existingApplication = await Application.findOne({
@@ -37,26 +27,9 @@ export const applyForJob = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Job not found", success: false });
   }
 
-  let resumeUrl = null;
-
-  // === Resume Upload ===
-  if (files?.resume?.[0]) {
-    const resumeFile = files.resume[0];
-    const fileUri = getDataUri(resumeFile);
-    const uploadedResume = await cloudinary.uploader.upload(fileUri.content, {
-      resource_type: "auto",
-      folder: "resumes",
-      format: "pdf",
-    });
-
-    resumeUrl = uploadedResume.secure_url;
-  }
-
   const newApplication = await Application.create({
     job: jobId,
     applicant: userId,
-
-    resume: resumeUrl,
   });
 
   job.applications.push(newApplication._id);

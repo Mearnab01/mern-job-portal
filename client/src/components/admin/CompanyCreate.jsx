@@ -1,23 +1,46 @@
 import React, { useState } from "react";
-import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { COMPANY_API } from "@/utils/constant";
+import { useDispatch } from "react-redux";
+import { setSingleCompany } from "@/redux/companySlice";
 
 const CompanyCreate = () => {
-  const [companyName, setCompanyName] = useState("");
+  const [companyName, setCompanyName] = useState();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const handleCreateCompany = async () => {
+    try {
+      const res = await axios.post(
+        `${COMPANY_API}/register-company`,
+        { companyName },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      console.log(res.data);
 
-  const handleCreate = () => {
-    // You can integrate this with your mutation logic or API service
-    console.log("Company to be created:", companyName);
-    // navigate(`/admin/companies/${newlyCreatedCompanyId}`);
+      if (res.data.success) {
+        dispatch(setSingleCompany(res.data.company));
+        toast.success(res.data.message);
+        const companyId = res?.data?.company?._id;
+        navigate(`/admin/companies/${companyId}`);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
   };
 
   return (
     <div>
-      <Navbar />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
           <h1 className="font-bold text-2xl sm:text-3xl">Your Company Name</h1>
@@ -45,9 +68,7 @@ const CompanyCreate = () => {
           >
             Cancel
           </Button>
-          <Button onClick={handleCreate} disabled={!companyName.trim()}>
-            Continue
-          </Button>
+          <Button onClick={handleCreateCompany}>Continue</Button>
         </div>
       </div>
     </div>

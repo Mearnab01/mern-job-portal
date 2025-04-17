@@ -54,52 +54,54 @@ const Profile = () => {
         {/* Right Side - Details + Update */}
         <div className="md:col-span-2 flex flex-col gap-6">
           {/* Skills & Resume */}
-          <div className="bg-white p-6 rounded-2xl shadow-md">
-            <h2 className="text-lg font-semibold mb-3">Skills</h2>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {user?.profile?.skills?.length > 0 ? (
-                user.profile.skills.map((skill, idx) => {
-                  const colors = [
-                    "bg-blue-100 text-blue-800",
-                    "bg-green-100 text-green-800",
-                    "bg-yellow-100 text-yellow-800",
-                    "bg-purple-100 text-purple-800",
-                    "bg-pink-100 text-pink-800",
-                    "bg-red-100 text-red-800",
-                  ];
-                  const colorClass = colors[idx % colors.length];
-                  return (
-                    <div
-                      key={idx}
-                      className={`rounded-full px-3 py-1 text-sm font-medium ${colorClass}`}
-                    >
-                      {skill}
-                    </div>
-                  );
-                })
-              ) : (
-                <span className="text-gray-400 italic">
-                  Add your skills (e.g: web dev, ai-ml..)
-                </span>
-              )}
-            </div>
+          {user?.role === "student" && (
+            <div className="bg-white p-6 rounded-2xl shadow-md">
+              <h2 className="text-lg font-semibold mb-3">Skills</h2>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {user?.profile?.skills?.length > 0 ? (
+                  user.profile.skills.map((skill, idx) => {
+                    const colors = [
+                      "bg-blue-100 text-blue-800",
+                      "bg-green-100 text-green-800",
+                      "bg-yellow-100 text-yellow-800",
+                      "bg-purple-100 text-purple-800",
+                      "bg-pink-100 text-pink-800",
+                      "bg-red-100 text-red-800",
+                    ];
+                    const colorClass = colors[idx % colors.length];
+                    return (
+                      <div
+                        key={idx}
+                        className={`rounded-full px-3 py-1 text-sm font-medium ${colorClass}`}
+                      >
+                        {skill}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <span className="text-gray-400 italic">
+                    Add your skills (e.g: web dev, ai-ml..)
+                  </span>
+                )}
+              </div>
 
-            {/* Resume */}
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <div className="text-md font-bold">Resume</div>
-              {isResume ? (
-                <a
-                  href={user.profile?.resume}
-                  target="_blank"
-                  className="text-blue-500 hover:underline"
-                >
-                  {user.profile?.resumeOriginalName}
-                </a>
-              ) : (
-                <span className="text-gray-400 italic">Add your resume</span>
-              )}
+              {/* Resume */}
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <div className="text-md font-bold">Resume</div>
+                {isResume ? (
+                  <a
+                    href={user.profile?.resume}
+                    target="_blank"
+                    className="text-blue-500 hover:underline"
+                  >
+                    {user.profile?.resumeOriginalName}
+                  </a>
+                ) : (
+                  <span className="text-gray-400 italic">Add your resume</span>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Update Bio Section (Full Width) */}
           <div className="bg-white p-6 rounded-2xl shadow-md w-full">
@@ -114,10 +116,12 @@ const Profile = () => {
       </div>
 
       {/* Applied Jobs */}
-      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-md p-6 mt-10">
-        <h1 className="font-bold text-lg mb-5">Applied Jobs</h1>
-        <AppliedJobTable />
-      </div>
+      {user.role === "student" && (
+        <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-md p-6 mt-10">
+          <h1 className="font-bold text-lg mb-5">Applied Jobs</h1>
+          <AppliedJobTable />
+        </div>
+      )}
     </div>
   );
 };

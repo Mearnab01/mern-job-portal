@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -9,37 +9,53 @@ import {
   TableRow,
 } from "../ui/table";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Edit2, Eye, MoreHorizontal } from "lucide-react";
+import { Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import toast from "react-hot-toast";
+import useGetAllAdminJobs from "@/hooks/useGetAllAdminJobs";
+import { JOB_API } from "@/utils/constant";
 
-// Dummy fallback job data – replace with props or fetched data
-const sampleJobs = [
-  {
-    _id: "1",
-    title: "Frontend Developer",
-    createdAt: "2024-04-08T12:00:00.000Z",
-    company: { name: "TechNova" },
-  },
-  {
-    _id: "2",
-    title: "Backend Developer",
-    createdAt: "2024-04-07T12:00:00.000Z",
-    company: { name: "CodeBase" },
-  },
-];
-
-const AdminJobsTable = ({ jobs = sampleJobs, searchQuery = "" }) => {
+const AdminJobsTable = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { allAdminJobs, searchJobByText } = useSelector((store) => store.job);
+  const [filterJobs, setFilterJobs] = useState(allAdminJobs);
 
-  const filteredJobs = jobs.filter((job) => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      job?.title?.toLowerCase().includes(query) ||
-      job?.company?.name.toLowerCase().includes(query)
-    );
-  });
+  useEffect(() => {
+    const filteredJobs = allAdminJobs.filter((job) => {
+      if (!searchJobByText) return true;
+      return (
+        job?.title?.toLowerCase().includes(searchJobByText.toLowerCase()) ||
+        job?.company?.name
+          ?.toLowerCase()
+          .includes(searchJobByText.toLowerCase())
+      );
+    });
+    setFilterJobs(filteredJobs);
+  }, [allAdminJobs, searchJobByText]);
+
+  const handleDelete = async (jobId) => {
+    try {
+      const confirm = window.confirm(
+        "Are you sure you want to delete this job?"
+      );
+      if (!confirm) return;
+
+      await axios.delete(`${JOB_API}/delete`, {
+        data: { id: jobId },
+        withCredentials: true,
+      });
+
+      toast.success("Job deleted successfully!");
+      dispatch(useGetAllAdminJobs());
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete job.");
+    }
+  };
 
   return (
     <motion.div
@@ -61,14 +77,14 @@ const AdminJobsTable = ({ jobs = sampleJobs, searchQuery = "" }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredJobs.length === 0 ? (
+          {filterJobs.length === 0 ? (
             <TableRow>
               <TableCell colSpan="4" className="text-center py-6 text-gray-400">
                 😕 No matching jobs found
               </TableCell>
             </TableRow>
           ) : (
-            filteredJobs.map((job) => (
+            filterJobs.map((job) => (
               <TableRow key={job._id}>
                 <TableCell>{job?.company?.name}</TableCell>
                 <TableCell>{job?.title}</TableCell>
@@ -82,20 +98,20 @@ const AdminJobsTable = ({ jobs = sampleJobs, searchQuery = "" }) => {
                     </PopoverTrigger>
                     <PopoverContent className="w-36">
                       <div
-                        onClick={() => navigate(`/admin/companies/${job._id}`)}
-                        className="flex items-center gap-2 cursor-pointer hover:text-primary"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                        <span>Edit</span>
-                      </div>
-                      <div
                         onClick={() =>
                           navigate(`/admin/jobs/${job._id}/applicants`)
                         }
-                        className="flex items-center gap-2 cursor-pointer hover:text-primary mt-2"
+                        className="flex items-center gap-2 cursor-pointer hover:text-primary"
                       >
                         <Eye className="w-4 h-4" />
                         <span>Applicants</span>
+                      </div>
+                      <div
+                        onClick={() => handleDelete(job._id)}
+                        className="flex items-center gap-2 cursor-pointer text-red-600 hover:underline mt-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span>Delete</span>
                       </div>
                     </PopoverContent>
                   </Popover>
