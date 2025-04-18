@@ -101,10 +101,11 @@ export const getAllJobs = asyncHandler(async (req, res) => {
     ],
   };
 
-  const jobs = await Job.find(query).populate({
-    path: "company",
-    createdAt: -1,
-  });
+  const jobs = await Job.find(query)
+    .populate({
+      path: "company",
+    })
+    .sort({ createdAt: -1 });
   if (jobs.length === 0) {
     console.warn("no jobs found");
   }
@@ -179,10 +180,10 @@ export const getSuggestedJobs = asyncHandler(async (req, res) => {
     throw new Error("Job not found");
   }
 
-  const { title, description, requirements } = originalJob;
+  const { requirements } = originalJob;
 
   // Build a clean skill set
-  const skills = [...requirements, title, description]
+  const skills = [...requirements]
     .join(" ")
     .toLowerCase()
     .match(/\b[a-z]+\b/g)
@@ -197,9 +198,7 @@ export const getSuggestedJobs = asyncHandler(async (req, res) => {
   }).populate("company", "name");
 
   const relevantJobs = allJobs.filter((job) => {
-    const jobText = [...job.requirements, job.title, job.description]
-      .join(" ")
-      .toLowerCase();
+    const jobText = [...job.requirements].join(" ").toLowerCase();
 
     const sharedWords = skillSet.filter((skill) => jobText.includes(skill));
 
@@ -207,5 +206,5 @@ export const getSuggestedJobs = asyncHandler(async (req, res) => {
     return sharedWords.length >= 2;
   });
 
-  res.status(200).json(relevantJobs);
+  res.status(200).json({ success: true, job: relevantJobs });
 });

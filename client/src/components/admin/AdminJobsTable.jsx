@@ -24,6 +24,7 @@ const AdminJobsTable = () => {
   const dispatch = useDispatch();
   const { allAdminJobs, searchJobByText } = useSelector((store) => store.job);
   const [filterJobs, setFilterJobs] = useState(allAdminJobs);
+  //console.log(allAdminJobs);
 
   useEffect(() => {
     const filteredJobs = allAdminJobs.filter((job) => {
@@ -93,7 +94,14 @@ const AdminJobsTable = () => {
           ) : (
             filterJobs.map((job) => (
               <TableRow key={job._id}>
-                <TableCell>{job?.company?.name}</TableCell>
+                <TableCell className="flex items-center gap-2">
+                  <img
+                    src={job?.company.logo}
+                    className="w-14 h-14 rounded-full object-contain"
+                  />
+
+                  {job?.company?.name}
+                </TableCell>
                 <TableCell>{job?.title}</TableCell>
                 <TableCell>{job?.createdAt?.split("T")[0]}</TableCell>
                 <TableCell className="text-right">

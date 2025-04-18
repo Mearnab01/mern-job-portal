@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -20,31 +20,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MoreHorizontal, FileText } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const shortlistingStatus = ["Accepted", "Rejected"];
 
-const dummyApplicants = [
-  {
-    _id: "a1",
-    fullname: "Aryan Verma",
-    email: "aryan@example.com",
-    phoneNumber: "+91-9876543210",
-    createdAt: "2025-04-11T08:00:00Z",
-    resume: "https://example.com/resume1.pdf",
-    resumeName: "Aryan_Resume.pdf",
-  },
-  {
-    _id: "a2",
-    fullname: "Divya Iyer",
-    email: "divya@example.com",
-    phoneNumber: "+91-9876501234",
-    createdAt: "2025-04-09T10:30:00Z",
-    resume: "https://example.com/resume2.pdf",
-    resumeName: "Divya_CV.pdf",
-  },
-];
-
 const ApplicantsTable = () => {
+  // Access the applicants and search text from the Redux store
+  const { applicants } = useSelector((store) => store.application);
+
+  // Ensure applicants is an array (fallback to empty array if undefined)
+  const applications = applicants?.applications || [];
+
   const [resumeURL, setResumeURL] = useState("");
 
   const statusHandler = (status, id) => {
@@ -68,20 +54,23 @@ const ApplicantsTable = () => {
         </TableHeader>
 
         <TableBody>
-          {dummyApplicants.map((item) => (
-            <TableRow key={item._id}>
-              <TableCell>{item.fullname}</TableCell>
-              <TableCell>{item.email}</TableCell>
-              <TableCell>{item.phoneNumber}</TableCell>
+          {/* Render applicants only if it's an array */}
+          {applications.map((item) => (
+            <TableRow key={item.applicant._id}>
+              <TableCell>{item.applicant.fullname}</TableCell>
+              <TableCell>{item.applicant.email}</TableCell>
+              <TableCell>{item.applicant.phoneNumber}</TableCell>
               <TableCell>
                 <Dialog>
                   <DialogTrigger asChild>
                     <span
                       className="text-blue-600 flex items-center gap-2 cursor-pointer"
-                      onClick={() => setResumeURL(item.resume)}
+                      onClick={() =>
+                        setResumeURL(item.applicant.profile.resume)
+                      }
                     >
                       <FileText className="w-4 h-4" />
-                      {item.resumeName}
+                      {item.applicant.profile.resumeOriginalName}
                     </span>
                   </DialogTrigger>
                   <DialogContent className="max-w-4xl w-full h-[80vh]">
@@ -94,7 +83,7 @@ const ApplicantsTable = () => {
                   </DialogContent>
                 </Dialog>
               </TableCell>
-              <TableCell>{item.createdAt.split("T")[0]}</TableCell>
+              <TableCell>{item.appliedAt.split("T")[0]}</TableCell>
               <TableCell className="text-right">
                 <Popover>
                   <PopoverTrigger>

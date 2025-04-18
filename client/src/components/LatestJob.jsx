@@ -15,7 +15,7 @@ const LatestJob = () => {
         {/* Job Listings */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {allJobs.length > 0 ? (
-            allJobs.map((job) => {
+            allJobs.slice(0, 6).map((job) => {
               return <LatestJobCard key={job._id} job={job} />;
             })
           ) : (
