@@ -17,6 +17,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import useGetAllAdminJobs from "@/hooks/useGetAllAdminJobs";
 import { JOB_API } from "@/utils/constant";
+import { setAllAdminJobs, setAllJobs } from "@/redux/jobSlice";
 
 const AdminJobsTable = () => {
   const navigate = useNavigate();
@@ -44,13 +45,19 @@ const AdminJobsTable = () => {
       );
       if (!confirm) return;
 
-      await axios.delete(`${JOB_API}/delete`, {
+      const res = await axios.delete(`${JOB_API}/delete`, {
         data: { id: jobId },
         withCredentials: true,
       });
 
-      toast.success("Job deleted successfully!");
-      dispatch(useGetAllAdminJobs());
+      if (res.data.success) {
+        toast.success(res.data.message || "Job deleted successfully!");
+        const updated = await axios.get(`${JOB_API}/all-jobs`, {
+          withCredentials: true,
+        });
+
+        dispatch(setAllAdminJobs(updated.data.jobs));
+      }
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete job.");

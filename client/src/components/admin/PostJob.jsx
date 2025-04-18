@@ -13,6 +13,11 @@ import {
 } from "../ui/select";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { Switch } from "../ui/switch";
+import { Textarea } from "../ui/textarea";
+import { JOB_API } from "@/utils/constant";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const PostJob = () => {
   const [input, setInput] = useState({
@@ -22,8 +27,10 @@ const PostJob = () => {
     salary: "",
     location: "",
     jobType: "",
-    experience: "",
-    position: 0,
+    experienceLevel: "",
+    position: "",
+    isActive: true,
+    isRemote: false,
     companyId: "",
   });
 
@@ -44,37 +51,51 @@ const PostJob = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    console.log("input", input);
+    try {
+      setLoading(true);
+      const res = await axios.post(`${JOB_API}/post-job`, input, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      console.log(res.data);
+
+      if (res.data.success) {
+        toast.success(res.data.message);
+        navigate("/admin/jobs");
+      }
+    } catch (error) {
+      console.log(error);
+
+      toast.error("failed to post job");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex items-center justify-center w-full px-4 py-8">
+    <div className="min-h-full bg-gray-200">
+      <div className="flex items-center justify-center w-full px-4 py-10">
         <form
           onSubmit={submitHandler}
-          className="w-full max-w-4xl bg-white border border-gray-200 rounded-2xl shadow-md p-8"
+          className="w-full bg-gray-100 max-w-4xl border border-gray-200 rounded-2xl shadow-sm p-8"
         >
-          <h2 className="text-2xl font-semibold mb-6 text-center text-gray-700">
-            Post a New Job
+          <h2 className="text-3xl font-semibold mb-8 text-center text-gray-800">
+            🚀 Post a New Job
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
               <Label>Title</Label>
               <Input
                 type="text"
                 name="title"
+                placeholder="e.g. Frontend Developer"
                 value={input.title}
                 onChange={changeEventHandler}
-              />
-            </div>
-            <div>
-              <Label>Description</Label>
-              <Input
-                type="text"
-                name="description"
-                value={input.description}
-                onChange={changeEventHandler}
+                required
+                className="peer"
               />
             </div>
             <div>
@@ -82,17 +103,23 @@ const PostJob = () => {
               <Input
                 type="text"
                 name="requirements"
+                placeholder="e.g. React, Node.js, MongoDB"
                 value={input.requirements}
                 onChange={changeEventHandler}
+                required
+                className="peer"
               />
             </div>
             <div>
-              <Label>Salary</Label>
+              <Label>Salary(In LPA)</Label>
               <Input
                 type="text"
                 name="salary"
+                placeholder="e.g. ₹5 LPA - ₹10 LPA"
                 value={input.salary}
                 onChange={changeEventHandler}
+                required
+                className="peer"
               />
             </div>
             <div>
@@ -100,50 +127,83 @@ const PostJob = () => {
               <Input
                 type="text"
                 name="location"
+                placeholder="e.g. Bangalore, Remote"
                 value={input.location}
                 onChange={changeEventHandler}
+                required
+                className="peer"
               />
             </div>
+
             <div>
               <Label>Job Type</Label>
-              <Input
-                type="text"
-                name="jobType"
-                value={input.jobType}
-                onChange={changeEventHandler}
-              />
+              <Select
+                onValueChange={(value) =>
+                  setInput((prev) => ({ ...prev, jobType: value }))
+                }
+              >
+                <SelectTrigger className="w-full mt-2">
+                  <SelectValue placeholder="Select job type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="full-time">Full-time</SelectItem>
+                    <SelectItem value="part-time">Part-time</SelectItem>
+                    <SelectItem value="contract">Contract</SelectItem>
+                    <SelectItem value="internship">Internship</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>Experience Level</Label>
+              <Select
+                onValueChange={(value) =>
+                  setInput((prev) => ({ ...prev, experienceLevel: value }))
+                }
+              >
+                <SelectTrigger className="w-full mt-2">
+                  <SelectValue placeholder="Select experience level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="entry">Entry</SelectItem>
+                    <SelectItem value="mid">Mid</SelectItem>
+                    <SelectItem value="senior">Senior</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="m-2">Position</Label>
               <Input
                 type="text"
-                name="experience"
-                value={input.experience}
-                onChange={changeEventHandler}
-              />
-            </div>
-            <div>
-              <Label>No. of Positions</Label>
-              <Input
-                type="number"
                 name="position"
+                placeholder="e.g. Python Developer"
+                maxLength={20}
                 value={input.position}
                 onChange={changeEventHandler}
+                required
+                className="peer"
               />
+              <span className="text-xs text-gray-500">
+                {input.position.length}/20 characters
+              </span>
             </div>
-            {companies.length > 0 && (
-              <div className="md:col-span-2">
-                <Label>Select Company</Label>
+            <div>
+              <Label className="m-2">Company</Label>
+              {companies.length > 0 ? (
                 <Select onValueChange={selectChangeHandler}>
-                  <SelectTrigger className="w-full mt-1">
-                    <SelectValue placeholder="Select a Company" />
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a company" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
                       {companies.map((company) => (
                         <SelectItem
                           key={company._id}
-                          value={company?.name?.toLowerCase()}
+                          value={company.name.toLowerCase()}
                         >
                           {company.name}
                         </SelectItem>
@@ -151,18 +211,68 @@ const PostJob = () => {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-              </div>
-            )}
+              ) : (
+                <p className="text-sm text-red-600 mt-2">
+                  * No companies found. Please register one before posting a
+                  job.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6 mt-8">
+            <div className="flex items-center gap-4">
+              <Label htmlFor="isActive" className="text-gray-600">
+                Is Active
+              </Label>
+              <Switch
+                id="isActive"
+                checked={input.isActive}
+                onCheckedChange={(value) =>
+                  setInput((prev) => ({ ...prev, isActive: value }))
+                }
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Label htmlFor="isRemote" className="text-gray-600">
+                Is Remote
+              </Label>
+              <Switch
+                id="isRemote"
+                checked={input.isRemote}
+                onCheckedChange={(value) =>
+                  setInput((prev) => ({ ...prev, isRemote: value }))
+                }
+              />
+            </div>
+          </div>
+
+          <div className="m-2">
+            <Label>Description</Label>
+            <Textarea
+              name="description"
+              placeholder="Job responsibilities, team, etc."
+              value={input.description}
+              onChange={changeEventHandler}
+              required
+              className="peer"
+            />
           </div>
 
           {loading ? (
-            <Button className="w-full mt-6" disabled>
+            <Button
+              className="mt-10 bg-blue-600 hover:bg-blue-700 w-fit px-6 py-2"
+              disabled
+            >
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Please wait
+              Posting Job...
             </Button>
           ) : (
-            <Button type="submit" className="w-full mt-6">
-              Post New Job
+            <Button
+              type="submit"
+              className="mt-10 bg-blue-600 hover:bg-blue-700 w-fit px-6 py-2"
+            >
+              Post Job
             </Button>
           )}
 

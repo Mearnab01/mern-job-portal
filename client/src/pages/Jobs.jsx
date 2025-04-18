@@ -33,7 +33,7 @@ const Jobs = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-full">
       <div className="max-w-[1400px] mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row gap-6">
           {/* Sidebar Filter - Only Desktop */}

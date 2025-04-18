@@ -48,7 +48,7 @@ const Job = ({ job }) => {
 
       <CardContent className="px-4 pb-0">
         <div className="flex items-center gap-3 mb-3">
-          <Avatar className="w-12 h-12">
+          <Avatar className="w-16 h-16 object-contain">
             <AvatarImage src={job?.company?.logo} />
           </Avatar>
           <div>
@@ -57,7 +57,9 @@ const Job = ({ job }) => {
           </div>
         </div>
 
-        <CardTitle className="text-lg font-bold mb-1">{job?.title}</CardTitle>
+        <CardTitle className="text-lg font-bold mb-1 truncate">
+          {job?.title}
+        </CardTitle>
         <CardDescription className="text-gray-600 text-sm truncate">
           {job?.description}
         </CardDescription>

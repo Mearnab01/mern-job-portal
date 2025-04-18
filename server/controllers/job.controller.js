@@ -48,6 +48,7 @@ export const createJobByAdmin = asyncHandler(async (req, res) => {
   await notification.save();
 
   return res.status(201).json({
+    success: true,
     message: "Job created successfully",
     job,
   });
@@ -56,10 +57,9 @@ export const createJobByAdmin = asyncHandler(async (req, res) => {
 //2. get all jobs by admin
 export const getAdminJobs = asyncHandler(async (req, res) => {
   const adminId = req.id;
-  const jobs = await Job.find({ createdBy: adminId }).populate({
-    path: "company",
-    createdAt: -1,
-  });
+  const jobs = await Job.find({ createdBy: adminId })
+    .populate({ path: "company" })
+    .sort({ createdAt: -1 });
   if (!jobs) {
     return res.status(404).json({ message: "No jobs found" });
   }
@@ -83,6 +83,7 @@ export const getJobById = asyncHandler(async (req, res) => {
 
   if (!job) return res.status(404).json({ message: "Job not found" });
   return res.status(200).json({
+    success: true,
     message: "Job fetched successfully",
     job,
   });

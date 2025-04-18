@@ -9,20 +9,16 @@ import axios from "axios";
 import { APPLICATION_API, JOB_API } from "@/utils/constant";
 import toast from "react-hot-toast";
 import SuggestedJobs from "@/components/SuggestedJobs";
+import { StopCircleIcon, Verified } from "lucide-react";
 
 const JobDetails = () => {
-  const params = useParams();
-  const jobId = params.id;
+  const { id: jobId } = useParams();
   const dispatch = useDispatch();
-
   const { user } = useSelector((store) => store.auth);
   const { singleJob } = useSelector((store) => store.job);
 
   const isInitiallyApplied =
-    user &&
-    singleJob?.applications?.some(
-      (application) => application.applicant === user._id
-    );
+    user && singleJob?.applications?.some((app) => app.applicant === user._id);
 
   const [isApplied, setIsApplied] = useState(isInitiallyApplied || false);
 
@@ -31,18 +27,17 @@ const JobDetails = () => {
       const res = await axios.get(`${APPLICATION_API}/apply/${jobId}`, {
         withCredentials: true,
       });
-
       if (res.data.success) {
         setIsApplied(true);
-        const updatedSingleJob = {
-          ...singleJob,
-          applications: [...singleJob.applications, { applicant: user?._id }],
-        };
-        dispatch(setSingleJob(updatedSingleJob));
+        dispatch(
+          setSingleJob({
+            ...singleJob,
+            applications: [...singleJob.applications, { applicant: user?._id }],
+          })
+        );
         toast.success(res.data.message);
       }
     } catch (error) {
-      console.error(error);
       toast.error(error.response?.data?.message || "Something went wrong!");
     }
   };
@@ -53,127 +48,171 @@ const JobDetails = () => {
         const res = await axios.get(`${JOB_API}/get-job/${jobId}`, {
           withCredentials: true,
         });
-        //console.log(dispatch(setSingleJob(res.data.job)));
-
         if (res.data.success) {
           dispatch(setSingleJob(res.data.job));
           setIsApplied(
-            res.data.job.applications.some(
-              (application) => application.applicant === user?._id
-            )
+            res.data.job.applications.some((app) => app.applicant === user?._id)
           );
         }
       } catch (error) {
-        console.error(error);
-        toast.error(response.data.error.message);
+        toast.error("Failed to load job");
       }
     };
     fetchSingleJob();
   }, [jobId, user?._id, dispatch]);
 
-  if (!user) {
+  if (!user)
     return (
-      <div className="text-center text-gray-600 py-20">
+      <div className="text-center py-20 text-gray-600">
         Please login to view job details.
       </div>
     );
-  }
 
   return (
-    <div className="max-w-6xl mx-auto my-10 px-4">
+    <motion.div
+      className="max-w-6xl mx-auto my-10 px-4"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1 space-y-6">
-          {/* Header */}
-          <div className="bg-white p-6 rounded-xl shadow-md flex flex-col md:flex-row justify-between items-start md:items-center">
+          <motion.div
+            className="bg-white p-6 rounded-xl shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
             <div className="flex items-center gap-4">
               <img
-                src={"https://github.com/shadcn.png"}
+                src={
+                  singleJob?.company?.logo || "https://github.com/shadcn.png"
+                }
                 alt="Company Logo"
-                className="w-14 h-14 rounded-md object-contain"
+                className="w-20 h-20 rounded-full object-cover"
               />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-indigo-800">
                   {singleJob?.company?.name}
                 </h1>
+                <p className="text-sm text-gray-700 mt-1">
+                  {singleJob?.company?.description ||
+                    "No description provided."}
+                </p>
+                <a
+                  className="text-sm text-blue-600 underline"
+                  href={singleJob?.company?.website || "#"}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Visit Website
+                </a>
               </div>
             </div>
 
             {user.role === "student" && (
-              <motion.div
-                whileHover={{ scale: isApplied ? 1 : 1.05 }}
-                className="mt-6 md:mt-0"
-              >
+              <motion.div whileHover={{ scale: isApplied ? 1 : 1.05 }}>
                 <Button
                   onClick={!isApplied ? applyJobHandler : null}
                   disabled={isApplied}
-                  className={`rounded-lg px-6 py-2 text-white ${
+                  className={`rounded-lg px-6 py-2 text-white transition ${
                     isApplied
                       ? "bg-gray-500 cursor-not-allowed"
-                      : "bg-purple-700 hover:bg-purple-800"
+                      : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                   }`}
                 >
                   {isApplied ? "Already Applied" : "Apply Now"}
                 </Button>
               </motion.div>
             )}
-          </div>
+          </motion.div>
 
-          {/* Tags */}
           <div className="flex gap-3 flex-wrap">
-            <Badge variant="outline" className="text-blue-700 font-medium">
+            <Badge className="bg-blue-100 text-blue-800 hover:bg-transparent hover:text-inherit cursor-default">
               {singleJob?.position}
             </Badge>
-            <Badge variant="outline" className="text-red-600 font-medium">
+            <Badge className="bg-green-100 text-green-800 hover:bg-transparent hover:text-inherit cursor-default">
               {singleJob?.jobType}
             </Badge>
-            <Badge variant="outline" className="text-purple-700 font-medium">
-              ₹ {singleJob?.salary} LPA
-            </Badge>
-            <Badge variant="outline" className="text-green-700 font-medium">
+            <Badge className="bg-purple-100 text-purple-800 hover:bg-transparent hover:text-inherit cursor-default">
               {singleJob?.location}
+            </Badge>
+            <Badge
+              className={`${
+                singleJob?.isRemote
+                  ? "bg-teal-100 text-teal-800 hover:bg-transparent hover:text-inherit cursor-default"
+                  : "bg-red-100 text-red-800 hover:bg-transparent hover:text-inherit cursor-default"
+              }`}
+            >
+              {singleJob?.isRemote ? "Remote" : "On-site"}
             </Badge>
           </div>
 
-          {/* Job Description */}
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <h2 className="text-xl font-semibold border-b pb-3 mb-6 text-gray-800">
-              Job Description
-            </h2>
-            <div className="space-y-4 text-gray-700">
-              <p>
-                <span className="font-semibold text-gray-900">
-                  Description:
-                </span>{" "}
-                {singleJob?.description}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-900">Experience:</span>{" "}
-                {singleJob?.experienceLevel} level
-              </p>
-              <p>
-                <span className="font-semibold text-gray-900">Salary:</span> ₹{" "}
-                {singleJob?.salary} LPA
-              </p>
-              <p>
-                <span className="font-semibold text-gray-900">Applicants:</span>{" "}
-                {singleJob?.applications?.length === 0
-                  ? "Not applied by anyone yet"
-                  : `${singleJob?.applications?.length} Applicant${
-                      singleJob?.applications?.length > 1 ? "s" : ""
-                    }`}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-900">Posted On:</span>{" "}
-                {new Date(singleJob?.updatedAt).toLocaleDateString() || "now"}
-              </p>
+          <div className="bg-white p-6 rounded-xl shadow-sm space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-indigo-700">
+                Job Description
+              </h2>
+              <Badge
+                variant="outline"
+                className={`flex items-center gap-1 font-semibold ${
+                  singleJob?.isActive
+                    ? "text-green-600 border-green-500"
+                    : "text-red-600 border-red-500"
+                }`}
+              >
+                {singleJob?.isActive ? (
+                  <Verified className="w-4 h-4" />
+                ) : (
+                  <StopCircleIcon className="w-4 h-4" />
+                )}
+                {singleJob?.isActive ? "Active" : "Inactive"}
+              </Badge>
             </div>
+
+            <p>
+              <span className="font-semibold text-indigo-900">
+                Description:
+              </span>{" "}
+              {singleJob?.description}
+            </p>
+            <div>
+              <span className="font-semibold text-indigo-900">
+                Requirements:
+              </span>
+              <ul className="list-disc list-inside mt-2 space-y-1 text-gray-700">
+                {Array.isArray(singleJob?.requirements) ? (
+                  singleJob.requirements.map((req, index) => (
+                    <li key={index}>{req}</li>
+                  ))
+                ) : (
+                  <li>{singleJob?.requirements}</li>
+                )}
+              </ul>
+            </div>
+            <p>
+              <span className="font-semibold text-indigo-900">Experience:</span>{" "}
+              {singleJob?.experienceLevel}
+            </p>
+            <p>
+              <span className="font-semibold text-indigo-900">Salary:</span> ₹{" "}
+              {singleJob?.salary} LPA
+            </p>
+            <p>
+              <span className="font-semibold text-indigo-900">Applicants:</span>{" "}
+              {singleJob?.applications?.length > 0
+                ? `${singleJob.applications.length} Applicant(s)`
+                : "No applicants yet"}
+            </p>
+            <p>
+              <span className="font-semibold text-indigo-900">Posted On:</span>{" "}
+              {new Date(singleJob?.updatedAt).toLocaleDateString()}
+            </p>
           </div>
         </div>
 
-        {/* Suggested Jobs */}
         <SuggestedJobs />
       </div>
-    </div>
+    </motion.div>
   );
 };
 
