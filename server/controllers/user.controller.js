@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 
 import { v2 as cloudinary } from "cloudinary";
 import getDataUri from "../middlewares/dataUri.js";
+import { Notification } from "../models/notification.model.js";
 //1. register user
 export const registerUser = asyncHandler(async (req, res) => {
   const { fullname, email, password, role, phoneNumber } = req.body;
@@ -44,7 +45,13 @@ export const registerUser = asyncHandler(async (req, res) => {
     role,
     phoneNumber,
   });
-
+  await Notification.create({
+    recipient: newUser._id,
+    message: `Welcome to our platform, ${fullname}!`,
+    type: "welcome_user",
+    sendAt: new Date(),
+    isRead: false,
+  });
   newUser.password = null;
   return generateToken(res, newUser, "User registered successfully");
 });
@@ -144,7 +151,7 @@ export const updateUser = asyncHandler(async (req, res) => {
     const resumeFile = files.resume[0];
     const fileUri = getDataUri(resumeFile);
     const uploadedResume = await cloudinary.uploader.upload(fileUri.content, {
-      resource_type: "auto",
+      resource_type: "raw",
       folder: "resumes",
       format: "pdf",
     });

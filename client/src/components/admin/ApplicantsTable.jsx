@@ -119,13 +119,15 @@ const ApplicantsTable = () => {
                           {item.applicant.profile.resumeOriginalName}
                         </span>
                       </DialogTrigger>
-                      <DialogContent className="max-w-4xl w-full h-[80vh]">
+                      <DialogContent className="max-w-5xl w-full">
                         <DialogTitle>Resume Preview</DialogTitle>
-                        <iframe
-                          src={resumeURL}
-                          title="Resume PDF"
-                          className="w-full h-full rounded border"
-                        />
+                        <div className="w-full h-[75vh]">
+                          <embed
+                            src={resumeURL}
+                            type="application/pdf"
+                            className="w-full h-full rounded border"
+                          />
+                        </div>
                       </DialogContent>
                     </Dialog>
                   </TableCell>

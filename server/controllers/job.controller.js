@@ -22,7 +22,7 @@ export const createJobByAdmin = asyncHandler(async (req, res) => {
   } = req.body;
 
   const userId = req.id;
-
+  const company = await Company.findById(companyId);
   const job = await Job.create({
     title,
     description,
@@ -40,10 +40,10 @@ export const createJobByAdmin = asyncHandler(async (req, res) => {
 
   const notification = new Notification({
     recipient: userId,
-    type: "job_related",
+    type: "job_posted",
     message: `New job created: ${title}`,
     relatedJob: job._id,
-    relatedCompany: companyId,
+    relatedCompany: company,
   });
 
   await notification.save();
@@ -130,7 +130,6 @@ export const getAllJobs = asyncHandler(async (req, res) => {
 // 5. Delete a job by admin
 export const deleteJobByAdmin = asyncHandler(async (req, res) => {
   const jobId = req.body.id;
-
   if (!jobId) {
     return res
       .status(400)
@@ -141,40 +140,9 @@ export const deleteJobByAdmin = asyncHandler(async (req, res) => {
   if (!job) {
     return res.status(404).json({ message: "Job not found", success: false });
   }
-
-  // Step 1: Find all users who saved or applied for the job
-  const affectedUsers = await User.find({
-    $or: [{ savedJobs: jobId }, { appliedJobs: jobId }],
-  });
-
-  console.log(
-    "Affected Users:",
-    affectedUsers.map((u) => u.email)
-  );
-
-  // Step 2: Remove the job from users' saved jobs
-  await User.updateMany({ savedJobs: jobId }, { $pull: { savedJobs: jobId } });
-
-  // Step 3: Delete related applications
   await Application.deleteMany({ job: jobId });
-
-  // Step 4: Delete the job itself
   await Job.findByIdAndDelete(jobId);
-
-  // Step 5: Delete related notifications
   await Notification.deleteMany({ relatedJob: jobId });
-
-  // Step 6: Notify affected users
-  const notifications = affectedUsers.map((user) => ({
-    recipient: user._id,
-    message: `The job "${job.title}" has been deleted by the admin.`,
-    type: "job_related",
-    relatedCompany: job.company,
-    relatedJob: null,
-    sendAt: new Date(),
-    isRead: false,
-  }));
-  await Notification.insertMany(notifications);
 
   res.status(200).json({
     message: "Job deleted and users notified successfully.",

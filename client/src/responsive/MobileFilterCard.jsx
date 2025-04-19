@@ -15,7 +15,7 @@ const MobileFilterCard = () => {
   };
 
   return (
-    <div className="w-full bg-white p-4 rounded-2xl shadow-md border max-w-sm mx-auto">
+    <div className="w-full bg-white p-4 rounded-2xl shadow-md border max-w-full mx-auto">
       <h1 className="font-semibold text-xl mb-4 text-gray-800">
         🔍 Filter Jobs
       </h1>

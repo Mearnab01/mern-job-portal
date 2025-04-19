@@ -117,6 +117,22 @@ export const updateApplicationStatus = asyncHandler(async (req, res) => {
       success: false,
     });
   }
+  const populatedApp = await updatedApplication.populate("applicant job");
+
+  const message =
+    status.toLowerCase() === "accepted"
+      ? `🎉 Your application for "${populatedApp.job.title}" has been accepted!`
+      : `😞 Your application for "${populatedApp.job.title}" was rejected.`;
+
+  await Notification.create({
+    recipient: populatedApp.applicant._id,
+    message,
+    type: "proposal_related",
+    relatedJob: populatedApp.job._id,
+    relatedCompany: populatedApp.job.company,
+    sendAt: new Date(),
+    isRead: false,
+  });
 
   return res.status(200).json({
     message: "Status updated successfully.",
@@ -154,12 +170,10 @@ export const deleteRejectedApplication = async (req, res) => {
 
     await application.deleteOne();
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Rejected application deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Rejected application deleted successfully",
+    });
   } catch (error) {
     console.error("Error deleting rejected application:", error.message);
     res

@@ -8,6 +8,10 @@ export const getAllNotifications = asyncHandler(async (req, res) => {
       path: "relatedJob",
       select: "title company",
     })
+    .populate({
+      path: "relatedCompany",
+      select: "name",
+    })
     .sort({ sendAt: -1 });
   if (!notification) {
     return res.status(404).json({ message: "No notifications found" });
