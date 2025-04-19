@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
 import Spline from "@splinetool/react-spline";
+import Searchbar from "./Searchbar";
 
 const HeroSection = () => {
   const [isSplineLoaded, setIsSplineLoaded] = useState(false);
@@ -19,19 +18,7 @@ const HeroSection = () => {
         </p>
 
         {/* Search Bar */}
-        <div className="flex items-center bg-white dark:bg-gray-800 rounded-full shadow-md overflow-hidden max-w-full mx-auto lg:mx-0">
-          <Input
-            type="text"
-            placeholder="Search jobs, companies..."
-            className="flex-grow px-4 py-3 text-gray-900 dark:text-gray-100 bg-transparent focus:outline-none"
-          />
-          <Button
-            onClick={() => console.log("Search clicked")}
-            className="bg-[#9a6efe] dark:bg-blue-700 text-white px-6 py-3 rounded-r-full hover:bg-[#8758f0] dark:hover:bg-blue-800 transition-all"
-          >
-            Search
-          </Button>
-        </div>
+        <Searchbar />
       </div>
 
       {/* Right Section - Spline Model with Loader */}

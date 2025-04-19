@@ -2,7 +2,7 @@ export const filterData = [
   {
     filterType: "Location",
     array: [
-      "Delhi NCR",
+      "Delhi",
       "Bangalore",
       "Hyderabad",
       "Pune",
@@ -19,35 +19,23 @@ export const filterData = [
     array: [
       "Frontend Developer",
       "Backend Developer",
-      "Fullstack Developer",
+      "Full Stack Developer",
       "Mobile App Developer",
       "DevOps Engineer",
-      "Data Scientist",
-      "Machine Learning Engineer",
+      "Data Engineer",
+      "ML Engineer",
       "UI/UX Designer",
-      "QA Engineer",
-      "Project Manager",
+      "Data Scientist",
+      "Product Manager",
     ],
   },
   {
-    filterType: "Salary",
-    array: [
-      "0 - 40k",
-      "40k - 80k",
-      "80k - 1.5L",
-      "1.5L - 3L",
-      "3L - 5L",
-      "5L - 10L",
-      "10L+",
-    ],
+    filterType: "JobType",
+    array: ["Full-Time", "Part-Time", "Internship", "Contract"],
   },
   {
-    filterType: "Job Type",
-    array: ["Full-Time", "Part-Time", "Internship", "Freelance", "Contract"],
-  },
-  {
-    filterType: "Experience Level",
-    array: ["Fresher", "1-2 Years", "2-5 Years", "5+ Years"],
+    filterType: "ExperienceLevel",
+    array: ["Entry", "Mid", "Senior"],
   },
 ];
 

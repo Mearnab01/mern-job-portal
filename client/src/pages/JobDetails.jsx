@@ -88,7 +88,7 @@ const JobDetails = () => {
                   singleJob?.company?.logo || "https://github.com/shadcn.png"
                 }
                 alt="Company Logo"
-                className="w-20 h-20 rounded-full object-cover"
+                className="w-20 h-20 rounded-full object-contain"
               />
               <div>
                 <h1 className="text-2xl font-bold text-indigo-800">

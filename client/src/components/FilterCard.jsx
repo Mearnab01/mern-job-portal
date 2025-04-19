@@ -1,17 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "./ui/label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { filterData } from "@/demoData";
-
+import { useDispatch } from "react-redux";
+import { setSearchedQuery } from "@/redux/jobSlice";
+import { useLocation, useSearchParams } from "react-router-dom";
 const FilterCard = () => {
+  const [selectedValue, setSelectedValue] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const dispatch = useDispatch();
+  const location = useLocation();
+
+  const changeHandler = (value) => {
+    setSelectedValue(value);
+  };
+  useEffect(() => {
+    dispatch(setSearchedQuery(selectedValue));
+    setSearchParams({ keyword: selectedValue });
+  }, [selectedValue, dispatch, setSearchParams]);
+
+  useEffect(() => {
+    const keywordFromURL = searchParams.get("keyword");
+    if (keywordFromURL) {
+      setSelectedValue(keywordFromURL);
+    }
+  }, [searchParams]);
+
   return (
     <div className="w-full bg-white p-5 rounded-2xl shadow-md border">
       <h1 className="font-semibold text-xl mb-4 text-gray-800">
         🔍 Filter Jobs
       </h1>
       <RadioGroup
-        //value={selectedValue}
-        //onValueChange={changeHandler}
+        value={selectedValue}
+        onValueChange={changeHandler}
         className="space-y-6"
       >
         {filterData.map((section, index) => (

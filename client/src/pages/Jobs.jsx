@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import FilterCard from "@/components/FilterCard";
 import Job from "@/components/Job";
 import { motion } from "framer-motion";
@@ -11,48 +12,65 @@ import {
 } from "@/components/ui/pagination";
 import MobileFilterCard from "@/responsive/MobileFilterCard";
 import { useSelector } from "react-redux";
+import useGetAllJobs from "@/hooks/useGetAllJobs"; // custom hook refetches based on query params
 
 const Jobs = () => {
   const { allJobs } = useSelector((store) => store.job);
+  const [filteredJobs, setFilteredJobs] = useState([]);
 
-  // pagination state
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const jobsPerPage = 6;
 
-  const totalPages = Math.ceil(allJobs.length / jobsPerPage);
+  // React Router hooks for URL params
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Extract query params from the URL
+  const queryParams = new URLSearchParams(location.search);
+  const keyword = queryParams.get("keyword") || "";
+  const locationParam = queryParams.get("location") || "";
+  const jobType = queryParams.get("jobType") || "";
+  const experienceLevel = queryParams.get("experienceLevel") || "";
+
+  // Fetch jobs using custom hook based on URL queryParams
+  useGetAllJobs({ keyword, location: locationParam, jobType, experienceLevel });
+
+  useEffect(() => {
+    setFilteredJobs(allJobs);
+    setCurrentPage(1); // reset pagination on filter change
+  }, [allJobs]);
+
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-  const currentJobs = allJobs.slice(indexOfFirstJob, indexOfLastJob);
+  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
 
-  const handlePrev = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleNext = () => {
+  const handlePrev = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+  const handleNext = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  };
 
   return (
     <div className="bg-gray-50 min-h-full">
       <div className="max-w-[1400px] mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row gap-6">
-          {/* Sidebar Filter - Only Desktop */}
+          {/* Sidebar Filter */}
           <aside className="hidden sm:block sm:w-1/4 sticky top-24 self-start max-h-[calc(100vh-6rem)] overflow-y-auto custom-scroll">
             <FilterCard />
           </aside>
 
-          {/* Main Content */}
+          {/* Main Job Section */}
           <main className="flex-1 w-full">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">
               Available Jobs
             </h2>
 
-            {/* Mobile Filter - Only Mobile */}
+            {/* Mobile Filter */}
             <div className="sm:hidden mb-6">
               <MobileFilterCard />
             </div>
 
-            {allJobs.length === 0 ? (
+            {filteredJobs.length === 0 ? (
               <div className="text-center text-gray-600 mt-10">
                 <p className="text-lg font-medium">🔍 No jobs found</p>
                 <p className="text-sm mt-2">
@@ -64,6 +82,7 @@ const Jobs = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {currentJobs.map((job) => (
                     <motion.div
+                      key={job._id}
                       initial={{ opacity: 0, y: 40, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       whileHover={{ scale: 1.03 }}
@@ -73,14 +92,13 @@ const Jobs = () => {
                         damping: 10,
                         duration: 0.5,
                       }}
-                      key={job._id}
                     >
                       <Job job={job} />
                     </motion.div>
                   ))}
                 </div>
 
-                {/* Pagination Controls */}
+                {/* Pagination */}
                 <Pagination className="mt-8">
                   <PaginationContent className="justify-center">
                     <PaginationItem>

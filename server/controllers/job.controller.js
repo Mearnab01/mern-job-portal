@@ -3,6 +3,7 @@ import { Job } from "../models/job.model.js";
 import { User } from "../models/user.model.js";
 import { Application } from "../models/application.model.js";
 import { Notification } from "../models/notification.model.js";
+import { Company } from "../models/company.model.js";
 
 //1.create a job by admin
 export const createJobByAdmin = asyncHandler(async (req, res) => {
@@ -93,12 +94,21 @@ export const getJobById = asyncHandler(async (req, res) => {
 //4. get all jobs for users
 export const getAllJobs = asyncHandler(async (req, res) => {
   const keyword = req.query.keyword || "";
+  const companies = await Company.find({
+    name: { $regex: keyword, $options: "i" },
+  });
+
+  const companyIds = companies.map((c) => c._id);
   const query = {
     $or: [
-      { title: { $regex: keyword, $options: "i" } }, // regex allows partia matches (e.g., "dev" matches "developer").
-      //options: "i" makes it case-insensitive.
+      { title: { $regex: keyword, $options: "i" } },
       { location: { $regex: keyword, $options: "i" } },
       { description: { $regex: keyword, $options: "i" } },
+      { position: { $regex: keyword, $options: "i" } },
+      { jobType: { $regex: keyword, $options: "i" } },
+      { experienceLevel: { $regex: keyword, $options: "i" } },
+      { requirements: { $regex: keyword, $options: "i" } },
+      { company: { $in: companyIds } },
     ],
   };
 
