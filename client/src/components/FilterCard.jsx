@@ -1,20 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { Label } from "./ui/label";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { filterData } from "@/demoData";
 import { useDispatch } from "react-redux";
 import { setSearchedQuery } from "@/redux/jobSlice";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { Checkbox } from "./ui/checkbox";
+
 const FilterCard = () => {
   const [selectedValue, setSelectedValue] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
+
   const changeHandler = (value) => {
-    setSelectedValue(value);
+    setSelectedValue((prevValue) => (prevValue === value ? "" : value));
   };
+
   useEffect(() => {
     dispatch(setSearchedQuery(selectedValue));
-    setSearchParams({ keyword: selectedValue });
+
+    if (selectedValue === "") {
+      setSearchParams({ keyword: "" });
+    } else {
+      setSearchParams({ keyword: selectedValue });
+    }
   }, [selectedValue, dispatch, setSearchParams]);
 
   useEffect(() => {
@@ -29,11 +37,7 @@ const FilterCard = () => {
       <h1 className="font-semibold text-xl mb-4 text-gray-800">
         🔍 Filter Jobs
       </h1>
-      <RadioGroup
-        value={selectedValue}
-        onValueChange={changeHandler}
-        className="space-y-6"
-      >
+      <div className="space-y-6">
         {filterData.map((section, index) => (
           <div key={index} className="space-y-2">
             <div className="flex items-center gap-2 mb-2">
@@ -49,10 +53,11 @@ const FilterCard = () => {
                   key={itemId}
                   className="flex items-center space-x-3 hover:bg-gray-50 px-3 py-2 rounded-md transition-colors cursor-pointer"
                 >
-                  <RadioGroupItem
-                    value={item}
+                  <Checkbox
                     id={itemId}
-                    className="border-blue-500 data-[state=checked]:bg-blue-500"
+                    checked={selectedValue === item}
+                    onCheckedChange={() => changeHandler(item)}
+                    className="border-blue-500"
                   />
                   <Label htmlFor={itemId} className="text-gray-600">
                     {item}
@@ -63,7 +68,7 @@ const FilterCard = () => {
             <hr className="mt-4" />
           </div>
         ))}
-      </RadioGroup>
+      </div>
     </div>
   );
 };
