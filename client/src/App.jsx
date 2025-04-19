@@ -16,6 +16,7 @@ import Applicants from "./components/admin/Applicants";
 import PostJob from "./components/admin/PostJob";
 import SuggestedJobs from "./components/SuggestedJobs";
 import CompanyCreate from "./components/admin/CompanyCreate";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 const App = () => {
   const Layout = () => {
@@ -40,12 +41,55 @@ const App = () => {
         { path: "/details/:id", element: <JobDetails /> },
 
         // ✅ Admin routes (no ProtectedRoute yet)
-        { path: "/admin/companies", element: <Companies /> },
-        { path: "/admin/companies/create", element: <CompanyCreate /> },
-        { path: "/admin/companies/:id", element: <CompanySetup /> },
-        { path: "/admin/jobs", element: <AdminJobs /> },
-        { path: "/admin/jobs/create", element: <PostJob /> },
-        { path: "/admin/jobs/:id/applicants", element: <Applicants /> },
+        {
+          path: "/admin/companies",
+          element: (
+            <ProtectedRoute>
+              <Companies />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/companies/create",
+          element: (
+            <ProtectedRoute>
+              <CompanyCreate />{" "}
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/companies/:id",
+          element: (
+            <ProtectedRoute>
+              <CompanySetup />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/jobs",
+          element: (
+            <ProtectedRoute>
+              <AdminJobs />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/jobs/create",
+          element: (
+            <ProtectedRoute>
+              <PostJob />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/jobs/:id/applicants",
+          element: (
+            <ProtectedRoute>
+              {" "}
+              <Applicants />
+            </ProtectedRoute>
+          ),
+        },
       ],
     },
   ]);

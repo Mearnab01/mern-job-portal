@@ -9,8 +9,6 @@ const FilterCard = () => {
   const [selectedValue, setSelectedValue] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
-  const location = useLocation();
-
   const changeHandler = (value) => {
     setSelectedValue(value);
   };
