@@ -12,7 +12,7 @@ const useGetAllAdminJobs = () => {
         const res = await axios.get(`${JOB_API}/admin-jobs`, {
           withCredentials: true,
         });
-        //console.log(dispatch(setAllAdminJobs(res.data.jobs)));
+        console.log(dispatch(setAllAdminJobs(res.data.jobs)));
 
         if (res.data.success) {
           dispatch(setAllAdminJobs(res.data.jobs));

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -9,28 +9,12 @@ import {
   TableRow,
 } from "./ui/table";
 import { Badge } from "./ui/badge";
-
-// Sample data — replace this with your real data later
-const sampleAppliedJobs = [
-  {
-    _id: "1",
-    createdAt: "2025-04-01T12:00:00Z",
-    status: "pending",
-    job: { title: "Frontend Developer", company: { name: "Tech Corp" } },
-  },
-  {
-    _id: "2",
-    createdAt: "2025-04-02T12:00:00Z",
-    status: "accepted",
-    job: { title: "React Engineer", company: { name: "CodeBase" } },
-  },
-  {
-    _id: "3",
-    createdAt: "2025-04-03T12:00:00Z",
-    status: "rejected",
-    job: { title: "UI/UX Designer", company: { name: "Designify" } },
-  },
-];
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { APPLICATION_API } from "@/utils/constant";
+import toast from "react-hot-toast";
+import { setAllAppliedJobs } from "@/redux/jobSlice";
+import { Trash2 } from "lucide-react";
 
 const statusColors = {
   pending: "bg-gray-100 text-gray-700",
@@ -39,7 +23,38 @@ const statusColors = {
 };
 
 const AppliedJobTable = () => {
-  if (sampleAppliedJobs.length === 0) {
+  const { allAppliedJobs } = useSelector((store) => store.job);
+  const dispatch = useDispatch();
+  //console.log(allAppliedJobs);
+
+  const handleDeleteApplication = async (applicationId) => {
+    try {
+      const confirm = window.confirm(
+        "Are you sure you want to delete this application?"
+      );
+      if (!confirm) return;
+
+      const res = await axios.delete(`${APPLICATION_API}/delete-rejected`, {
+        data: { applicationId },
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        toast.success(res.data.message || "Application deleted");
+
+        const updated = await axios.get(`${APPLICATION_API}/get`, {
+          withCredentials: true,
+        });
+
+        dispatch(setAllAppliedJobs(updated.data.job));
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete application.");
+    }
+  };
+
+  if (!allAppliedJobs || allAppliedJobs.length === 0) {
     return (
       <div className="text-center py-10 text-gray-500 text-sm border rounded-xl bg-white shadow-sm">
         <p className="mb-2">You haven’t applied to any jobs yet.</p>
@@ -69,25 +84,51 @@ const AppliedJobTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sampleAppliedJobs.map((job) => {
+          {allAppliedJobs.map((job) => {
             const { _id, createdAt, status, job: jobDetails } = job;
             const date = createdAt.split("T")[0];
             const badgeColor =
               statusColors[status] || "bg-gray-200 text-gray-800";
+            const companyName = jobDetails?.company?.name || "N/A";
+            const logo = jobDetails?.company?.logo;
 
             return (
               <TableRow key={_id} className="hover:bg-gray-50 transition">
                 <TableCell>{date}</TableCell>
                 <TableCell className="font-medium text-gray-800">
-                  {jobDetails.title}
+                  {jobDetails?.title || "N/A"}
                 </TableCell>
-                <TableCell>{jobDetails.company.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10">
+                      {logo && (
+                        <img
+                          src={logo}
+                          alt={companyName}
+                          className="w-full h-full rounded-full object-contain border border-de_primary bg-white"
+                        />
+                      )}
+                    </div>
+                    <span>{companyName}</span>
+                  </div>
+                </TableCell>
                 <TableCell className="text-right">
                   <Badge
                     className={`rounded-full px-3 py-1 text-sm font-medium ${badgeColor}`}
                   >
                     {status.toUpperCase()}
                   </Badge>
+                </TableCell>
+                <TableCell className="text-right flex items-center justify-end gap-2">
+                  {status === "rejected" && (
+                    <button
+                      onClick={() => handleDeleteApplication(_id)}
+                      className="text-red-500 hover:text-red-700 transition"
+                      title="Delete rejected application"
+                    >
+                      <Trash2 className="text-red-700 m-2" />
+                    </button>
+                  )}
                 </TableCell>
               </TableRow>
             );

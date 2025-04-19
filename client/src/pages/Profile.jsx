@@ -5,9 +5,16 @@ import { useSelector } from "react-redux";
 import UpdateProfile from "@/components/UpdateProfile";
 import AppliedJobTable from "@/components/AppliedJobTable";
 import { setUser } from "@/redux/authSlice";
+import useGetAllAppliedJob from "@/hooks/useGetAllAppliedJob";
+import useGetAllCompanies from "@/hooks/useGetAllCompanies";
 
 const Profile = () => {
+  useGetAllAppliedJob();
+  useGetAllCompanies();
   const { user } = useSelector((store) => store.auth);
+  const { companies } = useSelector((store) => store.company);
+  //console.log(companies);
+
   const [imagePreview, setImagePreview] = useState(
     user?.profile?.profilePicture || "https://github.com/shadcn.png"
   );
@@ -18,7 +25,9 @@ const Profile = () => {
   }, [user?.profile?.profilePicture]);
 
   const isResume = !!user?.profile?.resume && user?.profile?.resumeOriginalName;
-
+  if (!user) {
+    return true;
+  }
   return (
     <div className="bg-gray-100 min-h-screen py-10 px-4">
       <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
@@ -112,6 +121,46 @@ const Profile = () => {
               <span className="text-gray-400 italic">Add your bio</span>
             )}
           </div>
+          {/* Companies Section */}
+          {user.role === "recruiter" && (
+            <div className="bg-white rounded-2xl shadow-md p-6">
+              <h1 className="text-2xl font-bold text-de_primary mb-4">
+                My Companies ({companies?.length || 0})
+              </h1>
+
+              {companies && companies.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {companies.map((company) => (
+                    <div
+                      key={company._id}
+                      className="border border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 shadow-sm bg-gray-50"
+                    >
+                      <img
+                        src={company.logo || "https://via.placeholder.com/80"}
+                        alt={company.name}
+                        className="w-16 h-16 object-contain rounded-full bg-white border"
+                      />
+                      <h2 className="text-lg font-semibold text-center">
+                        {company.name}
+                      </h2>
+                      <a
+                        href={company.website}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-600 text-sm hover:underline break-all"
+                      >
+                        {company.website}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400 italic">
+                  No companies registered yet.
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

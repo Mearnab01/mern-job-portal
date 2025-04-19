@@ -92,18 +92,13 @@ export const updateCompany = asyncHandler(async (req, res) => {
   });
 });
 
-// 3. Get all companies
+// 3. Get all admin companies
 export const getAllCompanies = asyncHandler(async (req, res) => {
   const userId = req.id;
   const companies = await Company.find({ userId }).sort({
     createdAt: -1,
   });
-  if (companies.length === 0) {
-    return res.status(404).json({
-      message: "No companies found",
-      success: false,
-    });
-  }
+
   res.status(200).json({
     message: "Companies fetched successfully",
     success: true,

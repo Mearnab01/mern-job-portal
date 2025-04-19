@@ -70,7 +70,7 @@ export const getAppliedJobs = asyncHandler(async (req, res) => {
   res.status(200).json({
     message: "Applications fetched successfully",
     success: true,
-    applications,
+    job: applications,
   });
 });
 //3. get all the applicants
@@ -124,3 +124,46 @@ export const updateApplicationStatus = asyncHandler(async (req, res) => {
     updatedApplication: updatedApplication.status,
   });
 });
+
+//5. delete rejected application
+export const deleteRejectedApplication = async (req, res) => {
+  const { applicationId } = req.body;
+  const applicantId = req.id;
+
+  if (!applicationId) {
+    return res.status(400).json({ message: "Application ID is required" });
+  }
+
+  try {
+    const application = await Application.findOne({
+      _id: applicationId,
+      applicant: applicantId,
+    });
+
+    if (!application) {
+      return res
+        .status(404)
+        .json({ message: "Application not found or unauthorized" });
+    }
+
+    if (application.status !== "rejected") {
+      return res
+        .status(400)
+        .json({ message: "Only rejected applications can be deleted" });
+    }
+
+    await application.deleteOne();
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Rejected application deleted successfully",
+      });
+  } catch (error) {
+    console.error("Error deleting rejected application:", error.message);
+    res
+      .status(500)
+      .json({ message: "Server error while deleting rejected application" });
+  }
+};

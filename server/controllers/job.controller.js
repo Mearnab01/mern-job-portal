@@ -64,6 +64,7 @@ export const getAdminJobs = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "No jobs found" });
   }
   return res.status(200).json({
+    success: true,
     message: "Jobs fetched successfully",
     jobs,
   });
@@ -112,12 +113,13 @@ export const getAllJobs = asyncHandler(async (req, res) => {
   return res.status(200).json({
     message: "Jobs fetched successfully",
     jobs,
+    success: true,
   });
 });
 
 // 5. Delete a job by admin
 export const deleteJobByAdmin = asyncHandler(async (req, res) => {
-  const jobId = req.body.id; // 🔥 ID now comes from the request body
+  const jobId = req.body.id;
 
   if (!jobId) {
     return res

@@ -12,47 +12,22 @@ import {
   setSearchApplicantsByText,
 } from "@/redux/applicationSlice";
 import { useDispatch, useSelector } from "react-redux";
+import useGetAllApplicants from "@/hooks/useGetAllApplicants";
 
 const Applicants = () => {
-  const { searchApplicantsByText } = useSelector((store) => store.application);
+  const { id } = useParams();
+  useGetAllApplicants(id);
   const dispatch = useDispatch();
   const { applicants } = useSelector((store) => store.application);
-  //console.log(applicants.applications);
-
-  const { id } = useParams();
+  const [searchApplicant, setSearchApplicant] = useState("");
+  const appliedBy = applicants.applications;
+  // console.log(applicants);
   useEffect(() => {
-    const fetchAllApplications = async () => {
-      try {
-        const res = await axios.get(`${APPLICATION_API}/${id}/applicants`, {
-          withCredentials: true,
-        });
-        if (res.data.success) {
-          dispatch(setAllApplicants(res.data.job));
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchAllApplications();
-  }, []);
-  const [filteredApplicants, setFilteredApplicants] = useState(applicants);
-
-  useEffect(() => {
-    if (!applicants?.applications) return;
-
-    const filtered = applicants.applications.filter((application) => {
-      const name = application?.applicant?.fullname?.toLowerCase() || "";
-      const email = application?.applicant?.email?.toLowerCase() || "";
-      const search = searchApplicantsByText?.toLowerCase() || "";
-
-      return name.includes(search) || email.includes(search);
-    });
-
-    setFilteredApplicants(filtered);
-  }, [applicants, searchApplicantsByText]);
+    dispatch(setSearchApplicantsByText(searchApplicant));
+  }, [searchApplicant]);
 
   const handleExportCSV = () => {
-    const csv = applicants.applications
+    const csv = appliedBy
       .map((a) => {
         const { fullname, email, phoneNumber } = a.applicant;
         const { resume } = a.applicant.profile;
@@ -79,10 +54,10 @@ const Applicants = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {applicants.applications.length === 0 ? (
+        {appliedBy.length === 0 ? (
           "Not applied yet"
         ) : (
-          <>🧑‍💻 Applicants ({applicants.applications.length})</>
+          <>🧑‍💻 Applicants ({appliedBy.length})</>
         )}
       </motion.h1>
 
@@ -95,26 +70,30 @@ const Applicants = () => {
         <Input
           className="w-full sm:max-w-xs"
           placeholder="Search by name or email"
-          onChange={(e) => setSearchApplicantsByText(e.target.value)}
+          onChange={(e) => setSearchApplicant(e.target.value)}
         />
         <Button
           variant="outline"
           onClick={handleExportCSV}
-          disabled={!applicants.applications?.length}
+          disabled={!appliedBy?.length}
         >
           <Download className="w-4 mr-2" />
           Export CSV
         </Button>
       </motion.div>
 
-      <motion.div
-        className="bg-white shadow-md rounded-xl p-4"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        <ApplicantsTable appliedBy={filteredApplicants} />
-      </motion.div>
+      {appliedBy.length === 0 ? (
+        <p className="text-gray-500 text-center">No one has applied yet 🥲</p>
+      ) : (
+        <motion.div
+          className="bg-white shadow-md rounded-xl p-4"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <ApplicantsTable applicants={appliedBy} />
+        </motion.div>
+      )}
     </div>
   );
 };

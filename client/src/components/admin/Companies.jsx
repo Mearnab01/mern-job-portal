@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 
 const Companies = () => {
   useGetAllCompanies();
+
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
