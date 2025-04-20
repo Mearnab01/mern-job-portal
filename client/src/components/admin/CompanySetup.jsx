@@ -27,7 +27,7 @@ const CompanySetup = () => {
   useEffect(() => {
     const fetchCompany = async () => {
       try {
-        const res = await axios.get(`${COMPANY_API}/${id}`, {
+        const res = await axios.get(`/api/company/${id}`, {
           withCredentials: true,
         });
         if (res.data.success) {

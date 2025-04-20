@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Table,
   TableBody,
@@ -11,7 +11,6 @@ import {
 import { Badge } from "./ui/badge";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { APPLICATION_API } from "@/utils/constant";
 import toast from "react-hot-toast";
 import { setAllAppliedJobs } from "@/redux/jobSlice";
 import { Trash2 } from "lucide-react";
@@ -25,7 +24,6 @@ const statusColors = {
 const AppliedJobTable = () => {
   const { allAppliedJobs } = useSelector((store) => store.job);
   const dispatch = useDispatch();
-  //console.log(allAppliedJobs);
 
   const handleDeleteApplication = async (applicationId) => {
     try {
@@ -34,7 +32,7 @@ const AppliedJobTable = () => {
       );
       if (!confirm) return;
 
-      const res = await axios.delete(`${APPLICATION_API}/delete-rejected`, {
+      const res = await axios.delete(`/api/applications/delete-rejected`, {
         data: { applicationId },
         withCredentials: true,
       });
@@ -42,7 +40,7 @@ const AppliedJobTable = () => {
       if (res.data.success) {
         toast.success(res.data.message || "Application deleted");
 
-        const updated = await axios.get(`${APPLICATION_API}/get`, {
+        const updated = await axios.get(`/api/application/get`, {
           withCredentials: true,
         });
 

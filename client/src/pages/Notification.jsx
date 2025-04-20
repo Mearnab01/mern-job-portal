@@ -23,7 +23,7 @@ const Notification = () => {
   const markAsRead = async (id) => {
     try {
       const res = await axios.put(
-        `${NOTIFICATION_API}/read-noti`,
+        `/api/notification/read-noti`,
         { _id: id },
         { withCredentials: true }
       );
@@ -45,7 +45,7 @@ const Notification = () => {
 
   const deleteNotification = async (id) => {
     try {
-      const res = await axios.delete(`${NOTIFICATION_API}/delete-noti`, {
+      const res = await axios.delete(`/api/notification/delete-noti`, {
         data: { _id: id },
         withCredentials: true,
       });
@@ -53,7 +53,7 @@ const Notification = () => {
       if (res.data.success) {
         toast.success(res.data.message || "Notification deleted");
         //dispatch(setNotifications((prev) => prev.filter((n) => n._id !== id)));
-        const updated = await axios.get(`${NOTIFICATION_API}/get-noti`, {
+        const updated = await axios.get(`/api/notification/get-noti`, {
           withCredentials: true,
         });
         dispatch(setNotifications(updated.data.notification));

@@ -15,7 +15,7 @@ const useGetAllJobs = () => {
         const searchParams = new URLSearchParams(location.search);
         const keyword = searchParams.get("keyword") || "";
 
-        const res = await axios.get(`${JOB_API}/all-jobs`, {
+        const res = await axios.get(`/api/job/all-jobs`, {
           params: { keyword },
           withCredentials: true,
         });

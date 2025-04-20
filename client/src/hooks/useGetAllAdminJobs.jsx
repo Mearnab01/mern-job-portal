@@ -9,7 +9,7 @@ const useGetAllAdminJobs = () => {
   useEffect(() => {
     const fetchAllAdminJobs = async () => {
       try {
-        const res = await axios.get(`${JOB_API}/admin-jobs`, {
+        const res = await axios.get(`/api/job/admin-jobs`, {
           withCredentials: true,
         });
         console.log(dispatch(setAllAdminJobs(res.data.jobs)));

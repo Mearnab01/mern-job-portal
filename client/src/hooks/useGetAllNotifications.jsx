@@ -10,7 +10,7 @@ const useGetAllNotifications = () => {
   useEffect(() => {
     const fetchAllNotis = async () => {
       try {
-        const res = await axios.get(`${NOTIFICATION_API}/get-noti`, {
+        const res = await axios.get(`/api/notification/get-noti`, {
           withCredentials: true,
         });
         if (res.data.success) {

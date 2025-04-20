@@ -74,7 +74,7 @@ const Auth = () => {
 
     try {
       dispatch(setLoading(true));
-      const { data } = await axios.post(`${USER_API}${endpoint}`, inputData, {
+      const { data } = await axios.post(`/api/user${endpoint}`, inputData, {
         withCredentials: true,
       });
       console.log(data);

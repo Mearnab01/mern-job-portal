@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { JOB_API } from "@/utils/constant";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { setSuggestedJobs } from "@/redux/jobSlice";
@@ -16,7 +15,7 @@ const SuggestedJobs = () => {
   useEffect(() => {
     const fetchSuggestedJobs = async () => {
       try {
-        const res = await axios.get(`${JOB_API}/suggested/${jobId}`);
+        const res = await axios.get(`/api/job/suggested/${jobId}`);
         if (res.data.success) {
           dispatch(setSuggestedJobs(res.data.job));
           //console.log(res.data);

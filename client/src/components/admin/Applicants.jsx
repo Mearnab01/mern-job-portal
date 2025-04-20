@@ -4,8 +4,6 @@ import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import axios from "axios";
-import { APPLICATION_API } from "@/utils/constant";
 import { useParams } from "react-router-dom";
 import {
   setAllApplicants,

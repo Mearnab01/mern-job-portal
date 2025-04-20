@@ -16,7 +16,7 @@ const CompanyCreate = () => {
   const handleCreateCompany = async () => {
     try {
       const res = await axios.post(
-        `${COMPANY_API}/register-company`,
+        `/api/company/register-company`,
         { companyName },
         {
           headers: {

@@ -98,7 +98,7 @@ const UpdateProfile = ({ user }) => {
     }
 
     try {
-      const res = await axios.post(`${USER_API}/update-profile`, updatedData, {
+      const res = await axios.post(`/api/user/update-profile`, updatedData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });

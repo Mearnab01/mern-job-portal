@@ -9,7 +9,7 @@ const useGetAllAppliedJob = () => {
   useEffect(() => {
     const getAllAppliedJobs = async () => {
       try {
-        const res = await axios.get(`${APPLICATION_API}/get`, {
+        const res = await axios.get(`/api/applications/get`, {
           withCredentials: true,
         });
         if (res.data.success) {

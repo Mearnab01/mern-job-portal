@@ -9,7 +9,7 @@ const useGetAllApplicants = (id) => {
   useEffect(() => {
     const fetchAllApplications = async () => {
       try {
-        const res = await axios.get(`${APPLICATION_API}/${id}/applicants`, {
+        const res = await axios.get(`/api/applications/${id}/applicants`, {
           withCredentials: true,
         });
         if (res.data.success) {

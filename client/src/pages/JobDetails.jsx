@@ -24,7 +24,7 @@ const JobDetails = () => {
 
   const applyJobHandler = async () => {
     try {
-      const res = await axios.get(`${APPLICATION_API}/apply/${jobId}`, {
+      const res = await axios.get(`/api/applications/apply/${jobId}`, {
         withCredentials: true,
       });
       if (res.data.success) {
@@ -45,7 +45,7 @@ const JobDetails = () => {
   useEffect(() => {
     const fetchSingleJob = async () => {
       try {
-        const res = await axios.get(`${JOB_API}/get-job/${jobId}`, {
+        const res = await axios.get(`/api/job/get-job/${jobId}`, {
           withCredentials: true,
         });
         if (res.data.success) {

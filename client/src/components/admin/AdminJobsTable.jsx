@@ -53,7 +53,7 @@ const AdminJobsTable = () => {
 
       if (res.data.success) {
         toast.success(res.data.message || "Job deleted successfully!");
-        const updated = await axios.get(`${JOB_API}/admin-jobs`, {
+        const updated = await axios.get(`/api/job/admin-jobs`, {
           withCredentials: true,
         });
 

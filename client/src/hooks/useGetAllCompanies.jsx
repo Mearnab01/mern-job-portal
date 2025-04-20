@@ -12,7 +12,7 @@ const useGetAllCompanies = () => {
     if (!user || user.role !== "recruiter") return;
     const fetchAllCompanies = async () => {
       try {
-        const res = await axios.get(`${COMPANY_API}/companies`, {
+        const res = await axios.get(`/api/company/companies`, {
           withCredentials: true,
         });
         if (res.data.success) {

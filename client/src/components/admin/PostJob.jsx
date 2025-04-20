@@ -53,7 +53,7 @@ const PostJob = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post(`${JOB_API}/post-job`, input, {
+      const res = await axios.post(`/api/job/post-job`, input, {
         headers: {
           "Content-Type": "application/json",
         },
