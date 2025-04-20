@@ -8,6 +8,6 @@ import {
 
 const router = express.Router();
 router.get("/get-noti", isAuth, getAllNotifications);
-router.put("/:id/read", isAuth, markNotificationAsRead);
-router.delete("/:id", isAuth, deleteNotification);
+router.put("/read-noti", isAuth, markNotificationAsRead);
+router.delete("/delete-noti", isAuth, deleteNotification);
 export default router;

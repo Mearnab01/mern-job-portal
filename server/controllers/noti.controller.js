@@ -10,7 +10,7 @@ export const getAllNotifications = asyncHandler(async (req, res) => {
     })
     .populate({
       path: "relatedCompany",
-      select: "name",
+      select: "name logo",
     })
     .sort({ sendAt: -1 });
   if (!notification) {
@@ -20,9 +20,9 @@ export const getAllNotifications = asyncHandler(async (req, res) => {
 });
 //2. mark notifications as read
 export const markNotificationAsRead = asyncHandler(async (req, res) => {
-  const notificationId = req.params.id;
+  const { _id } = req.body;
   const notification = await Notification.findByIdAndUpdate(
-    { _id: notificationId, recipient: req.id },
+    { _id, recipient: req.id },
     { isRead: true },
     { new: true }
   );
@@ -35,9 +35,9 @@ export const markNotificationAsRead = asyncHandler(async (req, res) => {
 });
 //3. delete a notification
 export const deleteNotification = asyncHandler(async (req, res) => {
-  const notificationId = req.params.id;
+  const { _id } = req.body;
   const notification = await Notification.findOneAndDelete({
-    _id: notificationId,
+    _id,
     recipient: req.id,
   });
   if (!notification) {

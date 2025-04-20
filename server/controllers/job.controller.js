@@ -37,16 +37,16 @@ export const createJobByAdmin = asyncHandler(async (req, res) => {
     isRemote,
     createdBy: userId,
   });
-
-  const notification = new Notification({
-    recipient: userId,
+  const users = await User.find({ _id: { $ne: userId } });
+  const notifications = users.map((user) => ({
+    recipient: user._id,
     type: "job_posted",
     message: `New job created: ${title}`,
     relatedJob: job._id,
-    relatedCompany: company,
-  });
+    relatedCompany: company._id,
+  }));
 
-  await notification.save();
+  await Notification.insertMany(notifications);
 
   return res.status(201).json({
     success: true,
