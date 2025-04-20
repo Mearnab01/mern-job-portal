@@ -36,4 +36,3 @@ lerna-debug.log*
 # System files
 .DS_Store
 Thumbs.db
-client/src/utils/constant.js
