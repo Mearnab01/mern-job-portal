@@ -1,3 +1,4 @@
+import path from "path";
 import cookieParser from "cookie-parser";
 import express from "express";
 import dotenv from "dotenv";
@@ -15,6 +16,7 @@ import { app, server } from "./socket/socket.js";
 dotenv.config({});
 //const app = express();
 
+const __dirname = path.resolve();
 // Middleware
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
@@ -39,6 +41,13 @@ app.use("/api/notification", notiRoutes);
 app.use("/api/applications", applicationRoutes);
 
 app.use(errorHandler);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/client/dist")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
+  });
+}
 connectdb().then(() => {
   server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
