@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Eye, MailIcon, Trash2 } from "lucide-react";
@@ -15,9 +15,11 @@ import { NOTIFICATION_API } from "@/utils/constant";
 const Notification = () => {
   useGetAllNotifications();
   const { notifications } = useSelector((store) => store.notification);
+  const dispatch = useDispatch();
+  //console.log(notifications);
+
   //console.log("notifications with undefined relatedCompany:",notifications.filter((n) => !n.relatedCompany));
 
-  const dispatch = useDispatch();
   const markAsRead = async (id) => {
     try {
       const res = await axios.put(

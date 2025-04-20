@@ -11,9 +11,9 @@ import companyRoutes from "./routes/company.routes.js";
 import jobRoutes from "./routes/job.routes.js";
 import notiRoutes from "./routes/noti.routes.js";
 import applicationRoutes from "./routes/application.routes.js";
-
+import { app, server } from "./socket/socket.js";
 dotenv.config({});
-const app = express();
+//const app = express();
 
 // Middleware
 app.use(express.json({ limit: "50mb" }));
@@ -40,7 +40,7 @@ app.use("/api/applications", applicationRoutes);
 
 app.use(errorHandler);
 connectdb().then(() => {
-  app.listen(port, () => {
+  server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
 });

@@ -25,6 +25,9 @@ import MobileNav from "@/responsive/MobileNav";
 
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
+  const { notifications } = useSelector((store) => store.notification);
+
+  const hasUnread = notifications?.some((n) => !n.isRead);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -104,9 +107,12 @@ const Navbar = () => {
               </Link>
               <Link
                 to="/notifications"
-                className="font-semibold hover:underline  px-4 py-2 transition duration-200 flex items-center"
+                className="font-semibold hover:underline px-4 py-2 transition duration-200 flex items-center relative"
               >
                 <Bell className="w-4 h-4 mr-2" />
+                {user && hasUnread && (
+                  <span className="absolute top-1 left-4 w-2 h-2 bg-red-600 rounded-full animate-ping" />
+                )}
                 <span className="hidden md:inline">Notification</span>
               </Link>
             </>

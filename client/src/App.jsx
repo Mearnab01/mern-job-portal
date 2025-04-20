@@ -6,7 +6,6 @@ import Auth from "./components/auth/Auth";
 //pages
 import Home from "./pages/Home";
 import Jobs from "./pages/Jobs";
-import Notification from "./pages/Notification";
 import JobDetails from "./pages/JobDetails";
 import Profile from "./pages/Profile";
 import Companies from "./components/admin/Companies";
@@ -17,6 +16,7 @@ import PostJob from "./components/admin/PostJob";
 import SuggestedJobs from "./components/SuggestedJobs";
 import CompanyCreate from "./components/admin/CompanyCreate";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
+import ProtectedNotification from "./components/ProtectedNotification";
 
 const App = () => {
   const Layout = () => {
@@ -35,7 +35,7 @@ const App = () => {
         { path: "/auth", element: <Auth /> },
         { path: "/", element: <Home /> },
         { path: "/jobs", element: <Jobs /> },
-        { path: "/notifications", element: <Notification /> },
+        { path: "/notifications", element: <ProtectedNotification /> },
         { path: "/my-profile", element: <Profile /> },
         { path: "/details", element: <SuggestedJobs /> },
         { path: "/details/:id", element: <JobDetails /> },

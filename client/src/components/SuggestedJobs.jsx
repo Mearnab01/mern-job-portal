@@ -19,7 +19,7 @@ const SuggestedJobs = () => {
         const res = await axios.get(`${JOB_API}/suggested/${jobId}`);
         if (res.data.success) {
           dispatch(setSuggestedJobs(res.data.job));
-          console.log(res.data);
+          //console.log(res.data);
         }
       } catch (error) {
         console.error("Error fetching suggested jobs:", error);

@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
 import getDataUri from "../middlewares/dataUri.js";
 import { Notification } from "../models/notification.model.js";
+import { io } from "../socket/socket.js";
 //1. register user
 export const registerUser = asyncHandler(async (req, res) => {
   const { fullname, email, password, role, phoneNumber } = req.body;
@@ -45,12 +46,25 @@ export const registerUser = asyncHandler(async (req, res) => {
     role,
     phoneNumber,
   });
-  await Notification.create({
+  /*   await Notification.create({
     recipient: newUser._id,
     message: `Welcome to our platform, ${fullname}!`,
     type: "welcome_user",
     sendAt: new Date(),
     isRead: false,
+  }); */
+  const welcomeNotification = await Notification.create({
+    recipient: newUser._id,
+    message: `Welcome to our platform, ${fullname}!`,
+    type: "welcome_user",
+    sendAt: new Date(),
+    isRead: false,
+  });
+
+  io.emit("new-user-registered", {
+    notification: welcomeNotification,
+    userId: newUser._id,
+    fullname: newUser.fullname,
   });
   newUser.password = null;
   return generateToken(res, newUser, "User registered successfully");
