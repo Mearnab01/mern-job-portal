@@ -4,7 +4,6 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useNavigate, useParams } from "react-router-dom";
-import { COMPANY_API } from "@/utils/constant";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
@@ -22,8 +21,6 @@ const CompanySetup = () => {
   });
 
   const [loading, setLoading] = useState(false);
-
-  // Optional: pre-fill form if editing an existing company
   useEffect(() => {
     const fetchCompany = async () => {
       try {
@@ -72,7 +69,7 @@ const CompanySetup = () => {
 
     try {
       setLoading(true);
-      const res = await axios.put(`${COMPANY_API}/update/${id}`, formData, {
+      const res = await axios.put(`/api/company/update/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

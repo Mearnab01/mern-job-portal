@@ -1,7 +1,6 @@
 import { setNotifications } from "@/redux/notificationSlice";
-import { NOTIFICATION_API } from "@/utils/constant";
 import axios from "axios";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 

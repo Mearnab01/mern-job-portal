@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "@/redux/authSlice";
-import { USER_API } from "@/utils/constant";
 import toast from "react-hot-toast";
 import axios from "axios";
 import MobileNav from "@/responsive/MobileNav";

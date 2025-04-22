@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/dialog";
 import { MoreHorizontal, FileText } from "lucide-react";
 import axios from "axios";
-import { APPLICATION_API } from "@/utils/constant";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
@@ -50,7 +49,7 @@ const ApplicantsTable = () => {
   const statusHandler = async (status, id) => {
     try {
       const res = await axios.post(
-        `${APPLICATION_API}/status-update/${id}`,
+        `/api/applications/status-update/${id}`,
         { status },
         { withCredentials: true }
       );

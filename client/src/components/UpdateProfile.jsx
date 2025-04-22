@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Check, Loader2, Upload } from "lucide-react";
 import axios from "axios";
-import { USER_API } from "@/utils/constant";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/authSlice";
 import toast from "react-hot-toast";

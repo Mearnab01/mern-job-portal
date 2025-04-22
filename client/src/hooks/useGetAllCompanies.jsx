@@ -1,5 +1,4 @@
 import { setCompanies } from "@/redux/companySlice";
-import { COMPANY_API } from "@/utils/constant";
 import axios from "axios";
 import { useEffect } from "react";
 import toast from "react-hot-toast";

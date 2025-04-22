@@ -5,7 +5,6 @@ import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { COMPANY_API } from "@/utils/constant";
 import { useDispatch } from "react-redux";
 import { setSingleCompany } from "@/redux/companySlice";
 

@@ -1,5 +1,4 @@
 import { setAllApplicants } from "@/redux/applicationSlice";
-import { APPLICATION_API } from "@/utils/constant";
 import axios from "axios";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";

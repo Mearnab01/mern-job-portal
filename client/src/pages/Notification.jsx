@@ -10,7 +10,6 @@ import { setNotifications } from "@/redux/notificationSlice";
 import useGetAllNotifications from "@/hooks/useGetAllNotifications";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { NOTIFICATION_API } from "@/utils/constant";
 
 const Notification = () => {
   useGetAllNotifications();

@@ -1,15 +1,16 @@
 import { setAllJobs } from "@/redux/jobSlice";
-import { JOB_API } from "@/utils/constant";
 import axios from "axios";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 const useGetAllJobs = () => {
+  const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const location = useLocation();
 
   useEffect(() => {
+    if (!user) return;
     const fetchAllJobs = async () => {
       try {
         const searchParams = new URLSearchParams(location.search);

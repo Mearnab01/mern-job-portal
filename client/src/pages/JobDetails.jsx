@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSingleJob } from "@/redux/jobSlice";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { APPLICATION_API, JOB_API } from "@/utils/constant";
 import toast from "react-hot-toast";
 import SuggestedJobs from "@/components/SuggestedJobs";
 import { StopCircleIcon, Verified } from "lucide-react";
@@ -43,6 +42,7 @@ const JobDetails = () => {
   };
 
   useEffect(() => {
+    if (!user) return;
     const fetchSingleJob = async () => {
       try {
         const res = await axios.get(`/api/job/get-job/${jobId}`, {
@@ -59,7 +59,7 @@ const JobDetails = () => {
       }
     };
     fetchSingleJob();
-  }, [jobId, user?._id, dispatch]);
+  }, [jobId, user, dispatch]);
 
   if (!user)
     return (

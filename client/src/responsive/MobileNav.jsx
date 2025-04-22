@@ -13,7 +13,6 @@ import {
   LogOut,
 } from "lucide-react";
 import { setUser } from "@/redux/authSlice";
-import { USER_API } from "@/utils/constant";
 import axios from "axios";
 import toast from "react-hot-toast";
 

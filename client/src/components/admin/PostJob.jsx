@@ -15,7 +15,6 @@ import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
-import { JOB_API } from "@/utils/constant";
 import toast from "react-hot-toast";
 import axios from "axios";
 

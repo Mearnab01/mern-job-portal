@@ -15,8 +15,6 @@ import { motion } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import toast from "react-hot-toast";
-import useGetAllAdminJobs from "@/hooks/useGetAllAdminJobs";
-import { JOB_API } from "@/utils/constant";
 import { setAllAdminJobs, setAllJobs } from "@/redux/jobSlice";
 
 const AdminJobsTable = () => {
@@ -46,7 +44,7 @@ const AdminJobsTable = () => {
       );
       if (!confirm) return;
 
-      const res = await axios.delete(`${JOB_API}/delete`, {
+      const res = await axios.delete(`/api/job/delete`, {
         data: { id: jobId },
         withCredentials: true,
       });
