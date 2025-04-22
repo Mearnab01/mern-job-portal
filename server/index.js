@@ -13,6 +13,9 @@ import jobRoutes from "./routes/job.routes.js";
 import notiRoutes from "./routes/noti.routes.js";
 import applicationRoutes from "./routes/application.routes.js";
 import { app, server } from "./socket/socket.js";
+import job from "./cron/cron.js";
+
+job.start();
 dotenv.config({});
 //const app = express();
 
@@ -28,7 +31,6 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 const port = process.env.PORT || 5000;
-//const port =process.env.PORT || (process.env.NODE_ENV === "production" ? 3000 : 5000);
 app.use("/api/user", userRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/job", jobRoutes);
