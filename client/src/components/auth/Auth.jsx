@@ -76,7 +76,7 @@ const Auth = () => {
       const { data } = await axios.post(`/api/user${endpoint}`, inputData, {
         withCredentials: true,
       });
-      console.log(data);
+      //console.log(data);
       dispatch(setUser(data.user));
       toast.success(data.message || `${type} successful`);
       navigate("/");
