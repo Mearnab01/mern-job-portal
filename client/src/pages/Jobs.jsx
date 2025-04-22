@@ -12,33 +12,28 @@ import {
 } from "@/components/ui/pagination";
 import MobileFilterCard from "@/responsive/MobileFilterCard";
 import { useSelector } from "react-redux";
-import useGetAllJobs from "@/hooks/useGetAllJobs"; // custom hook refetches based on query params
+import useGetAllJobs from "@/hooks/useGetAllJobs";
 
 const Jobs = () => {
   const { allJobs } = useSelector((store) => store.job);
   const [filteredJobs, setFilteredJobs] = useState([]);
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const jobsPerPage = 6;
 
-  // React Router hooks for URL params
   const location = useLocation();
-  const navigate = useNavigate();
 
-  // Extract query params from the URL
   const queryParams = new URLSearchParams(location.search);
   const keyword = queryParams.get("keyword") || "";
   const locationParam = queryParams.get("location") || "";
   const jobType = queryParams.get("jobType") || "";
   const experienceLevel = queryParams.get("experienceLevel") || "";
 
-  // Fetch jobs using custom hook based on URL queryParams
   useGetAllJobs({ keyword, location: locationParam, jobType, experienceLevel });
 
   useEffect(() => {
     setFilteredJobs(allJobs);
-    setCurrentPage(1); // reset pagination on filter change
+    setCurrentPage(1);
   }, [allJobs]);
 
   const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);

@@ -31,7 +31,7 @@ const ApplicantsTable = () => {
   const { applicants, searchApplicantsByText } = useSelector(
     (store) => store.application
   );
-  const appliedBy = applicants.applications;
+  const appliedBy = applicants?.applications || [];
   const [filterApplicants, setFilterApplicants] = useState(appliedBy);
 
   useEffect(() => {

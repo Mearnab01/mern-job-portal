@@ -5,10 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { useParams } from "react-router-dom";
-import {
-  setAllApplicants,
-  setSearchApplicantsByText,
-} from "@/redux/applicationSlice";
+import { setSearchApplicantsByText } from "@/redux/applicationSlice";
 import { useDispatch, useSelector } from "react-redux";
 import useGetAllApplicants from "@/hooks/useGetAllApplicants";
 
@@ -18,7 +15,7 @@ const Applicants = () => {
   const dispatch = useDispatch();
   const { applicants } = useSelector((store) => store.application);
   const [searchApplicant, setSearchApplicant] = useState("");
-  const appliedBy = applicants.applications;
+  const appliedBy = applicants?.applications || [];
   // console.log(applicants);
   useEffect(() => {
     dispatch(setSearchApplicantsByText(searchApplicant));
@@ -55,7 +52,7 @@ const Applicants = () => {
         {appliedBy.length === 0 ? (
           "Not applied yet"
         ) : (
-          <>🧑‍💻 Applicants ({appliedBy.length})</>
+          <>🧑‍💻 Applicants ({appliedBy.length || ""})</>
         )}
       </motion.h1>
 

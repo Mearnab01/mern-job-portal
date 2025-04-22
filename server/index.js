@@ -21,26 +21,14 @@ const __dirname = path.resolve();
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
-const allowedOrigins = process.env.CORS_ORIGIN.split(",");
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS policy: Not allowed origin"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  })
-);
+app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
 });
 const port = process.env.PORT || 5000;
+//const port =process.env.PORT || (process.env.NODE_ENV === "production" ? 3000 : 5000);
 app.use("/api/user", userRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/job", jobRoutes);
