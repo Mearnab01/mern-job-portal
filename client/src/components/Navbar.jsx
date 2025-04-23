@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,12 +21,16 @@ import { setUser } from "@/redux/authSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 import MobileNav from "@/responsive/MobileNav";
+import { setNotifications } from "@/redux/notificationSlice";
+import io from "socket.io-client";
 
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
   const { notifications } = useSelector((store) => store.notification);
+  //console.log("notifications", notifications);
 
-  const hasUnread = notifications?.some((n) => !n.isRead);
+  const hasUnread =
+    Array.isArray(notifications) && notifications.some((n) => !n.isRead);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -46,6 +50,39 @@ const Navbar = () => {
       toast.error(error.response.data.message || "Failed to Logout user!");
     }
   };
+  useEffect(() => {
+    const socket = io("http://localhost:3000", {
+      transports: ["websocket", "polling"],
+    });
+
+    socket.on("connect", () => {
+      console.log("Connected to Socket.IO server!", socket.id);
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Connection failed:", err.message);
+    });
+
+    socket.on("new_job_notification", (notification) => {
+      console.log("New notification received:", notification);
+      dispatch(setNotifications([...notifications, notification]));
+      toast.success("You have a new notification!");
+    });
+    socket.on("new_user_registered", (notification) => {
+      console.log("New notification received:", notification);
+      dispatch(setNotifications([...notifications, notification]));
+      toast.success("You have a new notification!");
+    });
+    socket.on("proposal_related", (notification) => {
+      console.log("New notification received:", notification);
+      dispatch(setNotifications([...notifications, notification]));
+      toast.success("You have a new notification!");
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [notifications, dispatch]);
 
   return (
     <div className="bg-gradient-to-r from-white to-de_primary shadow-md">

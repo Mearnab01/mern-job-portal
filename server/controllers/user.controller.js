@@ -46,13 +46,6 @@ export const registerUser = asyncHandler(async (req, res) => {
     role,
     phoneNumber,
   });
-  /*   await Notification.create({
-    recipient: newUser._id,
-    message: `Welcome to our platform, ${fullname}!`,
-    type: "welcome_user",
-    sendAt: new Date(),
-    isRead: false,
-  }); */
   const welcomeNotification = await Notification.create({
     recipient: newUser._id,
     message: `Welcome to our platform, ${fullname}!`,
@@ -61,7 +54,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     isRead: false,
   });
 
-  io.emit("new-user-registered", {
+  io.emit("new_user_registered", {
     notification: welcomeNotification,
     userId: newUser._id,
     fullname: newUser.fullname,

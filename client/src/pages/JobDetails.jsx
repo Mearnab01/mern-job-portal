@@ -94,7 +94,7 @@ const JobDetails = () => {
                 <h1 className="text-2xl font-bold text-indigo-800">
                   {singleJob?.company?.name}
                 </h1>
-                <p className="text-sm text-gray-700 mt-1">
+                <p className="hidden md:block md:text-sm md:text-gray-700 mt-1">
                   {singleJob?.company?.description ||
                     "No description provided."}
                 </p>
@@ -148,6 +148,11 @@ const JobDetails = () => {
           </div>
 
           <div className="bg-white p-6 rounded-xl shadow-sm space-y-6">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-xl font-bold text-de_primary p-1 ">
+                {singleJob?.title}
+              </h1>
+            </div>
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-indigo-700">
                 Job Description

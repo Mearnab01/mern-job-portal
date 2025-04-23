@@ -10,6 +10,7 @@ import { setNotifications } from "@/redux/notificationSlice";
 import useGetAllNotifications from "@/hooks/useGetAllNotifications";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { io } from "socket.io-client";
 
 const Notification = () => {
   useGetAllNotifications();
@@ -64,7 +65,39 @@ const Notification = () => {
       toast.error("Error occurred while deleting the notification");
     }
   };
+  useEffect(() => {
+    const socket = io("http://localhost:3000", {
+      transports: ["websocket", "polling"],
+    });
 
+    socket.on("connect", () => {
+      console.log("Connected to Socket.IO server!", socket.id);
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Connection failed:", err.message);
+    });
+
+    socket.on("new_job_notification", (notification) => {
+      console.log("New notification received:", notification);
+      dispatch(setNotifications([...notifications, notification]));
+      toast.success("You have a new notification!");
+    });
+    socket.on("new_user_registered", (notification) => {
+      console.log("New notification received:", notification);
+      dispatch(setNotifications([...notifications, notification]));
+      toast.success("You have a new notification!");
+    });
+    socket.on("proposal_related", (notification) => {
+      console.log("New notification received:", notification);
+      dispatch(setNotifications([...notifications, notification]));
+      toast.success("You have a new notification!");
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [notifications, dispatch]);
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white px-4 py-10">
       <div className="max-w-4xl mx-auto">
@@ -99,62 +132,65 @@ const Notification = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {notifications?.map((n) => (
-                <motion.div
-                  key={n._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Card
-                    className={`flex items-start gap-4 p-4 border ring-1 ring-gray-100 rounded-xl shadow-sm transition-all hover:scale-[1.01] hover:shadow-md bg-white cursor-pointer ${
-                      n.isRead ? "opacity-70" : "opacity-100"
-                    }`}
+              {notifications &&
+                notifications?.map((n) => (
+                  <motion.div
+                    key={n._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <img
-                      src={
-                        n.relatedCompany?.logo ||
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzPCmaaFJYIywZaF5Ue20ptsBZBchr0_y--w&s"
-                      }
-                      alt={n.relatedCompany?.name || "logo"}
-                      className="w-12 h-12 rounded-full object-contain border border-de_primary"
-                    />
-                    <div className="flex-1">
-                      <CardHeader className="p-0 mb-1">
-                        <CardTitle className="text-md font-semibold text-gray-800">
-                          {n.relatedCompany?.name || n.type || "Unknown"}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-0 text-sm text-gray-600">
-                        <p>{n.message}</p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          {formatDistanceToNow(new Date(n.sendAt), {
-                            addSuffix: true,
-                          })}
-                        </p>
-                      </CardContent>
-                    </div>
-                    <div className="flex items-end gap-2">
-                      {!n.isRead && (
+                    <Card
+                      className={`flex items-start gap-4 p-4 border ring-1 ring-gray-100 rounded-xl shadow-sm transition-all hover:scale-[1.01] hover:shadow-md bg-white cursor-pointer ${
+                        n.isRead ? "opacity-70" : "opacity-100"
+                      }`}
+                    >
+                      <img
+                        src={
+                          n.relatedCompany?.logo ||
+                          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzPCmaaFJYIywZaF5Ue20ptsBZBchr0_y--w&s"
+                        }
+                        alt={n.relatedCompany?.name || "logo"}
+                        className="w-12 h-12 rounded-full object-contain border border-de_primary"
+                      />
+                      <div className="flex-1">
+                        <CardHeader className="p-0 mb-1">
+                          <CardTitle className="text-md font-semibold text-gray-800">
+                            {n.relatedCompany?.name || n.type || "Unknown"}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0 text-sm text-gray-600">
+                          <p>{n.message}</p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {isNaN(new Date(n?.sendAt))
+                              ? "Just now"
+                              : formatDistanceToNow(new Date(n.sendAt), {
+                                  addSuffix: true,
+                                })}
+                          </p>
+                        </CardContent>
+                      </div>
+                      <div className="flex items-end gap-2">
+                        {!n.isRead && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => markAsRead(n._id)}
+                          >
+                            <Eye className="w-4 h-4 text-blue-500" />
+                          </Button>
+                        )}
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => markAsRead(n._id)}
+                          onClick={() => deleteNotification(n._id)}
                         >
-                          <Eye className="w-4 h-4 text-blue-500" />
+                          <Trash2 className="w-4 h-4 text-red-500" />
                         </Button>
-                      )}
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => deleteNotification(n._id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </Button>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
             </div>
           )}
         </ScrollArea>

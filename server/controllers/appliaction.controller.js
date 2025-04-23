@@ -3,6 +3,7 @@ import { Application } from "../models/application.model.js";
 import { Notification } from "../models/notification.model.js";
 import { User } from "../models/user.model.js";
 import { Job } from "../models/job.model.js";
+import { io } from "../socket/socket.js";
 
 //1. application for a job
 export const applyForJob = asyncHandler(async (req, res) => {
@@ -121,10 +122,10 @@ export const updateApplicationStatus = asyncHandler(async (req, res) => {
 
   const message =
     status.toLowerCase() === "accepted"
-      ? `🎉 Your application for "${populatedApp.job.title}" has been accepted!`
-      : `😞 Your application for "${populatedApp.job.title}" was rejected.`;
+      ? `🎉 Congrtulation, Your application for "${populatedApp.job.title}" has been accepted!`
+      : `😞 Opps, Your application for "${populatedApp.job.title}" was rejected.`;
 
-  await Notification.create({
+  const createdNotification = await Notification.create({
     recipient: populatedApp.applicant._id,
     message,
     type: "proposal_related",
@@ -133,6 +134,11 @@ export const updateApplicationStatus = asyncHandler(async (req, res) => {
     sendAt: new Date(),
     isRead: false,
   });
+
+  io.to(populatedApp.applicant._id).emit(
+    "proposal_related",
+    createdNotification
+  );
 
   return res.status(200).json({
     message: "Status updated successfully.",

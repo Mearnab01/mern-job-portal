@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js";
 import { Application } from "../models/application.model.js";
 import { Notification } from "../models/notification.model.js";
 import { Company } from "../models/company.model.js";
-
+import { io } from "../socket/socket.js";
 //1.create a job by admin
 export const createJobByAdmin = asyncHandler(async (req, res) => {
   const {
@@ -47,7 +47,12 @@ export const createJobByAdmin = asyncHandler(async (req, res) => {
   }));
 
   await Notification.insertMany(notifications);
-
+  io.emit("new_job_notification", {
+    type: "job_posted",
+    message: `New job created: ${title}`,
+    relatedJob: job,
+    relatedCompany: company,
+  });
   return res.status(201).json({
     success: true,
     message: "Job created successfully",
