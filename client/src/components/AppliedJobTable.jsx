@@ -39,12 +39,18 @@ const AppliedJobTable = () => {
 
       if (res.data.success) {
         toast.success(res.data.message || "Application deleted");
+        try {
+          const updated = await axios.get(`/api/applications/get`, {
+            withCredentials: true,
+          });
 
-        const updated = await axios.get(`/api/application/get`, {
-          withCredentials: true,
-        });
-
-        dispatch(setAllAppliedJobs(updated.data.job));
+          const jobs = updated?.data?.job || [];
+          dispatch(setAllAppliedJobs(jobs));
+        } catch (err) {
+          console.error("Error fetching updated applications", err);
+          dispatch(setAllAppliedJobs([]));
+          toast.error("Couldn't refresh applications.");
+        }
       }
     } catch (error) {
       console.error(error);

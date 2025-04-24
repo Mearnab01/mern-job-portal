@@ -7,7 +7,11 @@ const notificationSlice = createSlice({
   },
   reducers: {
     setNotifications: (state, action) => {
-      state.notifications = action.payload;
+      if (typeof action.payload === "function") {
+        state.notifications = action.payload(state.notifications);
+      } else {
+        state.notifications = action.payload;
+      }
     },
   },
 });

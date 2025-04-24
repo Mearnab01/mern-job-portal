@@ -37,7 +37,7 @@ export const applyForJob = asyncHandler(async (req, res) => {
   await job.save();
 
   if (user.role === "student") {
-    await Notification.create({
+    const submittedProposalApplication = await Notification.create({
       recipient: userId,
       type: "proposal_related",
       message: `Your application for "${job.title}" has been submitted successfully.`,
@@ -46,6 +46,7 @@ export const applyForJob = asyncHandler(async (req, res) => {
       isRead: false,
       sendAt: new Date(),
     });
+    io.to(userId).emit("proposal_related", submittedProposalApplication);
   }
 
   res.status(200).json({
@@ -135,7 +136,7 @@ export const updateApplicationStatus = asyncHandler(async (req, res) => {
     isRead: false,
   });
 
-  io.to(populatedApp.applicant._id).emit(
+  io.to(populatedApp.applicant._id.toString()).emit(
     "proposal_related",
     createdNotification
   );

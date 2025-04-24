@@ -15,6 +15,7 @@ import { io } from "socket.io-client";
 const Notification = () => {
   useGetAllNotifications();
   const { notifications } = useSelector((store) => store.notification);
+  const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   //console.log(notifications);
 
@@ -69,35 +70,31 @@ const Notification = () => {
     const socket = io("http://localhost:3000", {
       transports: ["websocket", "polling"],
     });
-
+    if (user?._id) {
+      socket.emit("join_room", user._id);
+    }
     socket.on("connect", () => {
-      console.log("Connected to Socket.IO server!", socket.id);
+      console.log("Connected to Socket.IO server!");
     });
 
     socket.on("connect_error", (err) => {
       console.error("Connection failed:", err.message);
     });
 
+    socket.on("proposal_related", (notification) => {
+      dispatch(setNotifications((prev) => [...prev, notification]));
+    });
     socket.on("new_job_notification", (notification) => {
-      console.log("New notification received:", notification);
-      dispatch(setNotifications([...notifications, notification]));
-      toast.success("You have a new notification!");
+      dispatch(setNotifications((prev) => [...prev, notification]));
     });
     socket.on("new_user_registered", (notification) => {
-      console.log("New notification received:", notification);
-      dispatch(setNotifications([...notifications, notification]));
-      toast.success("You have a new notification!");
-    });
-    socket.on("proposal_related", (notification) => {
-      console.log("New notification received:", notification);
-      dispatch(setNotifications([...notifications, notification]));
-      toast.success("You have a new notification!");
+      dispatch(setNotifications((prev) => [...prev, notification]));
     });
 
     return () => {
       socket.disconnect();
     };
-  }, [notifications, dispatch]);
+  }, [user?._id, dispatch]);
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white px-4 py-10">
       <div className="max-w-4xl mx-auto">

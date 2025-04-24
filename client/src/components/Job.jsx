@@ -15,7 +15,6 @@ import {
 
 const Job = ({ job }) => {
   const navigate = useNavigate();
-
   const daysAgoFunction = (mongodbTime) => {
     if (!mongodbTime) return null;
     const createdAt = new Date(mongodbTime);
@@ -48,12 +47,12 @@ const Job = ({ job }) => {
 
       <CardContent className="px-4 pb-0">
         <div className="flex items-center gap-3 mb-3">
-          <Avatar className="w-16 h-16 object-contain">
+          <Avatar className="w-16 h-16 object-cover rounded-full border border-gray-200 bg-white">
             <AvatarImage src={job?.company?.logo} />
           </Avatar>
           <div>
             <h1 className="font-medium text-base">{job?.company?.name}</h1>
-            <p className="text-sm text-gray-500">India</p>
+            <p className="text-sm text-gray-500">{job?.company?.location}</p>
           </div>
         </div>
 

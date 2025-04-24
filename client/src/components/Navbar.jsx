@@ -54,9 +54,11 @@ const Navbar = () => {
     const socket = io("http://localhost:3000", {
       transports: ["websocket", "polling"],
     });
-
+    if (user?._id) {
+      socket.emit("join_room", user._id); // join room
+    }
     socket.on("connect", () => {
-      console.log("Connected to Socket.IO server!", socket.id);
+      console.log("Connected to Socket.IO server!");
     });
 
     socket.on("connect_error", (err) => {
@@ -64,17 +66,14 @@ const Navbar = () => {
     });
 
     socket.on("new_job_notification", (notification) => {
-      console.log("New notification received:", notification);
       dispatch(setNotifications([...notifications, notification]));
       toast.success("You have a new notification!");
     });
     socket.on("new_user_registered", (notification) => {
-      console.log("New notification received:", notification);
       dispatch(setNotifications([...notifications, notification]));
       toast.success("You have a new notification!");
     });
     socket.on("proposal_related", (notification) => {
-      console.log("New notification received:", notification);
       dispatch(setNotifications([...notifications, notification]));
       toast.success("You have a new notification!");
     });

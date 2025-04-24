@@ -12,7 +12,11 @@ const io = new Server(server, {
   },
 });
 io.on("connection", (socket) => {
-  console.log("user connected", socket.id);
+  //console.log("user connected", socket.id);
+  socket.on("join_room", (userId) => {
+    socket.join(userId); // create/join a room named after user ID
+    console.log(`Socket ${socket.id} joined room ${userId}`);
+  });
 
   socket.on("new_job_notification", (notification) => {
     //console.log("Sending notification:", notification);
@@ -24,7 +28,7 @@ io.on("connection", (socket) => {
   });
   socket.on("proposal_related", (notification) => {
     console.log("Sending notification:", notification);
-    socket.emit("user_proposal_related", notification);
+    socket.emit("proposal_related", notification);
   });
   socket.on("disconnect", () => {
     console.log("Socket disconnected:");
