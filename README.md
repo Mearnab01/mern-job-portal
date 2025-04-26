@@ -6,8 +6,6 @@ A full-stack job portal application built with the MERN stack. It provides a pla
 
 ## 🚀 Features
 
-## 📌 Features
-
 | 👤 Candidate                                        | 🧑‍💼 Recruiter                                   |   🔔 Common Features                                |
 |-----------------------------------------------------|---------------------------------------------------|-----------------------------------------------------|
 | Register & login securely (JWT Auth)                | Register & login                                  | Real-time notification system (Socket.IO)           |
