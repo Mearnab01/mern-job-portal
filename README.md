@@ -30,24 +30,16 @@ A full-stack job portal application built with the MERN stack. It provides a pla
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- React.js
-- Redux Toolkit
-- Tailwind CSS
-- React Router
-- Axios
+## 🛠️ Tech Stack
 
-### Backend
-- Node.js
-- Express.js
-- MongoDB (Mongoose)
-- JWT (Authentication)
-- Socket.IO
+| Frontend                   | Backend                       | Deployment             |
+|----------------------------|-------------------------------|------------------------|
+| React.js                   | Node.js                       | Frontend: Render       |
+| Redux Toolkit              | Express.js                    | Backend: Render        |
+| Tailwind CSS               | MongoDB (Mongoose)            | Database: MongoDB Atlas|
+| React Router               | JWT (Authentication)          |                        |
+| Axios                      | Socket.IO                     |                        |
 
-### Deployment
-- Frontend: Render
-- Backend: Render
-- Database: MongoDB Atlas
 
 ---
 
