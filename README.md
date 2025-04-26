@@ -6,29 +6,17 @@ A full-stack job portal application built with the MERN stack. It provides a pla
 
 ## 🚀 Features
 
-### 👤 Candidate
-- Register & login securely (JWT Auth)
-- Browse and filter jobs
-- Apply for jobs
-- Track application status in dashboard
-- Real-time notifications on job status
+## 📌 Features
 
-### 🧑‍💼 Recruiter
-- Register & login
-- Create and manage job postings
-- View list of applicants for each job
-- Real-time updates on applications
-
-### 🔔 Common Features
-- Real-time notification system (Socket.IO)
-- Clean UI and user experience
-- Fully responsive design
-- Authentication & protected routes
-- Error handling & loading states
+| 👤 Candidate                                        | 🧑‍💼 Recruiter                                   |   🔔 Common Features                                |
+|-----------------------------------------------------|---------------------------------------------------|-----------------------------------------------------|
+| Register & login securely (JWT Auth)                | Register & login                                  | Real-time notification system (Socket.IO)           |
+| Browse and filter jobs                              | Create and manage job postings                    | Clean UI and user experience                        |
+| Apply for jobs                                      | View list of applicants for each job              | Fully responsive design                             |
+| Track application status in dashboard               | Real-time updates on applications                 | Authentication & protected routes                   |
+| Real-time notifications on job status               |                                                   | Error handling & loading states                     |
 
 ---
-
-## 🛠️ Tech Stack
 
 ## 🛠️ Tech Stack
 
