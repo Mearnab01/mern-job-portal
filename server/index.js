@@ -13,9 +13,9 @@ import jobRoutes from "./routes/job.routes.js";
 import notiRoutes from "./routes/noti.routes.js";
 import applicationRoutes from "./routes/application.routes.js";
 import { app, server } from "./socket/socket.js";
-import job from "./cron/cron.js";
+//import job from "./cron/cron.js";
 
-job.start();
+//job.start();
 dotenv.config({});
 //const app = express();
 
